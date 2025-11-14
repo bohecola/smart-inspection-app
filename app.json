@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bohecola.smartinspectionapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.bohecola.smartinspectionapp"
     },
     "web": {
       "output": "static",
@@ -51,6 +53,12 @@
         "projectId": "c6f86fa7-3848-4c35-97e7-80894d6642a8"
       }
     },
-    "owner": "bohecola"
+    "owner": "bohecola",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c6f86fa7-3848-4c35-97e7-80894d6642a8"
+    }
   }
 }

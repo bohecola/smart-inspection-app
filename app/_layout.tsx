@@ -5,12 +5,17 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import '@/global.css';
+
 export default function RootLayout() {
 
   const { isLoggedIn } = useAuthStore();
 
   return (
-    <React.Fragment>
+    
+    <GluestackUIProvider mode="dark">
+      <React.Fragment>
       <StatusBar style="auto" />
       <Stack>
         <Stack.Protected guard={isLoggedIn}>
@@ -21,5 +26,7 @@ export default function RootLayout() {
         </Stack.Protected>
       </Stack>
     </React.Fragment>
+    </GluestackUIProvider>
+  
   );
 }

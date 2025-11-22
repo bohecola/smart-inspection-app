@@ -1,0 +1,57 @@
+import type { UserVO } from '@/api/system/user/types'
+import { deleteItemAsync, getItem, setItem } from 'expo-secure-store'
+import { isEmpty } from 'lodash'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { person, userLogout } from '@/api/comm'
+
+interface UserState {
+  token: string
+  roles: string[]
+  permissions: string[]
+  info: UserVO
+  setToken: (token: string) => void
+  get: () => Promise<void>
+  logout: () => Promise<void>
+}
+
+export const useUserStore = create(persist<UserState>(set => ({
+  token: undefined,
+  info: null,
+  roles: [],
+  permissions: [],
+  setToken: (token: string) => {
+    set(state => ({
+      ...state,
+      token,
+    }))
+  },
+  get: async () => {
+    const { data } = await person()
+    set((state) => {
+      return {
+        ...state,
+        info: data.user,
+        roles: isEmpty(data.roles) ? ['ROLE_DEFAULT'] : data.roles,
+        permissions: data.permissions ?? [],
+      }
+    })
+  },
+  logout: async () => {
+    await userLogout()
+    set(state => ({
+      ...state,
+      token: undefined,
+      info: null,
+      roles: [],
+      permissions: [],
+    }))
+  },
+}), {
+  name: 'user-store',
+  storage: createJSONStorage(() => ({
+    setItem,
+    getItem,
+    removeItem: deleteItemAsync,
+  })),
+}))

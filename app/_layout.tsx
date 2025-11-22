@@ -1,32 +1,64 @@
-import "../global.css";
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import { isNil } from 'lodash-es'
+import React from 'react'
+import { DialogProvider } from '@/components/dialog'
+import { useAppToast } from '@/components/toast'
+import { Fab } from '@/components/ui/fab'
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
+import { Icon, MoonIcon, SunIcon } from '@/components/ui/icon'
+import { useAppStore } from '@/store/app'
+import { useUserStore } from '@/store/user'
+import '@/global.css'
 
-import { useAuthStore } from "@/utils/authStore";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import '@/global.css';
+if (__DEV__) {
+  require('../ReactotronConfig')
+}
 
 export default function RootLayout() {
+  // 初始化 toast 实例
+  useAppToast()
 
-  const { isLoggedIn } = useAuthStore();
+  const { token } = useUserStore()
+
+  const { colorMode, color, backgroundColor, setColorMode } = useAppStore()
 
   return (
-    
-    <GluestackUIProvider mode="dark">
-      <React.Fragment>
-      <StatusBar style="auto" />
-      <Stack>
-        <Stack.Protected guard={isLoggedIn}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack.Protected>
-        <Stack.Protected guard={!isLoggedIn}>
-          <Stack.Screen name="sign-in" />
-        </Stack.Protected>
-      </Stack>
-    </React.Fragment>
+    <GluestackUIProvider mode={colorMode}>
+      <DialogProvider>
+        <React.Fragment>
+          <StatusBar style="auto" />
+
+          <Stack screenOptions={{
+            headerTitleAlign: 'center',
+            headerTintColor: color,
+            headerStyle: {
+              backgroundColor,
+            },
+          }}
+          >
+            <Stack.Protected guard={!isNil(token)}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
+              <Stack.Screen name="prod/[id]" options={{ title: '生产任务详情' }} />
+              <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
+              <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
+              <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
+            </Stack.Protected>
+            <Stack.Protected guard={isNil(token)}>
+              <Stack.Screen name="sign-in" options={{ title: '登录' }} />
+            </Stack.Protected>
+          </Stack>
+
+          <Fab className="bottom-28 right-6 z-0" onPress={() => setColorMode(colorMode === 'light' ? 'dark' : 'light')}>
+            <Icon
+              as={colorMode === 'light' ? MoonIcon : SunIcon}
+              className="text-typography-0"
+            >
+            </Icon>
+          </Fab>
+        </React.Fragment>
+      </DialogProvider>
     </GluestackUIProvider>
-  
-  );
+  )
 }

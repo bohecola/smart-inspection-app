@@ -258,7 +258,7 @@ cssInterop(PrimitiveIcon, {
   },
 });
 
-type IFormControlProps = React.ComponentProps<typeof UIFormControl> &
+export type IFormControlProps = React.ComponentProps<typeof UIFormControl> &
   VariantProps<typeof formControlStyle>;
 
 const FormControl = React.forwardRef<

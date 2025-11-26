@@ -79,17 +79,12 @@ axiosInstance.interceptors.response.use(
         return res.data
       // Token 过期
       case ResultCodeEnum.TOKEN_EXPIRED:
-        showConfirmDialog({
+        return showConfirmDialog({
           title: '提示',
           description: '登录身份已失效，请重新登录!',
         })
-          .then(() => {
-            user.logout()
-          })
-          .catch(() => {
-            // on cancel
-          })
-        return Promise.reject(new Error('登录超时'))
+          .then(user.logout)
+          .catch(() => Promise.reject(new Error('登录超时，请退出重新登录')))
       // 系统内部错误
       case ResultCodeEnum.ERROR:
         toast.error(msg)

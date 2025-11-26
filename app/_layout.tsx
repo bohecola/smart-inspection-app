@@ -40,8 +40,11 @@ export default function RootLayout() {
             <Stack.Protected guard={!isNil(token)}>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
-              <Stack.Screen name="prod/[id]" options={{ title: '生产任务详情' }} />
+              <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
+              <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
+              <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
               <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
+              <Stack.Screen name="inspec/[id]" options={{ title: '巡检任务详情' }} />
               <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
               <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
             </Stack.Protected>

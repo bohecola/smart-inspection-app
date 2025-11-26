@@ -28,7 +28,11 @@ export default function Index() {
 
   return (
     <View className="p-4 flex-1 bg-background-50">
-      <Image source={BannerImage} className="w-full h-32 rounded-xl" />
+      <Image
+        source={BannerImage}
+        className="w-full h-32 rounded-xl"
+        alt="Banner"
+      />
 
       <Card className="mt-4">
         <Grid className="gap-y-9" _extra={{ className: 'grid-cols-12' }}>
@@ -44,7 +48,11 @@ export default function Index() {
                   router.push(menu.path)
                 }}
               >
-                <Image source={menu.imgUrl} className="w-20 h-20" />
+                <Image
+                  source={menu.imgUrl}
+                  className="w-20 h-20"
+                  alt={menu.title}
+                />
                 <Text className="text-sm">{menu.title}</Text>
               </Pressable>
             </GridItem>

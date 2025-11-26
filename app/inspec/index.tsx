@@ -1,10 +1,7 @@
-import { View } from 'react-native'
-import { Text } from '@/components/ui/text'
+import Inspec from '@/modules/inspec'
 
-export default function Inspec() {
+export default function InspecPage() {
   return (
-    <View>
-      <Text>Index</Text>
-    </View>
+    <Inspec />
   )
 }

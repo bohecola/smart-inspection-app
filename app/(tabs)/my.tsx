@@ -46,6 +46,7 @@ export default function SettingsScreen() {
           <Image
             source={defaultAvatar}
             className="w-20 h-20 rounded-full"
+            alt="默认头像"
           />
           <Text className="font-bold">{info?.nickName}</Text>
         </View>

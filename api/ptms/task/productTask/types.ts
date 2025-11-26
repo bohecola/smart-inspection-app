@@ -28,7 +28,7 @@ export interface ProductTaskVO {
    */
   description?: string
   /**
-   * ID;生产工作任务表
+   * ID
    */
   id: string
   /**
@@ -38,9 +38,9 @@ export interface ProductTaskVO {
   /**
    * 计划结束日期
    */
-  planEndDate?: Date
+  planEndDate?: string
   /**
-   * 生产计划id;生产计划id(product_plan表id)
+   * 生产计划id
    */
   planId?: number
   /**
@@ -50,7 +50,7 @@ export interface ProductTaskVO {
   /**
    * 计划开始日期
    */
-  planStartDate?: Date
+  planStartDate?: string
   /**
    * 计划类型
    */
@@ -63,11 +63,11 @@ export interface ProductTaskVO {
   /**
    * 实际结束日期
    */
-  realEndDate?: Date
+  realEndDate?: string
   /**
    * 实际开始日期
    */
-  realStartDate?: Date
+  realStartDate?: string
   /**
    * 备注
    */
@@ -77,17 +77,9 @@ export interface ProductTaskVO {
    */
   status?: string
   /**
-   * 工作任务项
-   */
-  taskItemList?: ProductTaskItemVO[]
-  /**
    * 任务执行记录
    */
   taskRecordList?: ProductTaskRecordVO[]
-  /**
-   * 任务执行项模板
-   */
-  taskResultTempList?: ProductTaskRecordResultVO[]
   /**
    * 生产任务方案id
    */
@@ -210,13 +202,17 @@ export interface ProductTaskItemVO {
 
 export interface ProductTaskRecordVO {
   /**
+   * ID
+   */
+  id?: string
+  /**
    * 创建人
    */
-  createBy?: number
+  createBy?: string
   /**
    * 项目部id
    */
-  deptId?: number
+  deptId?: string
   /**
    * 项目部名称
    */
@@ -228,15 +224,11 @@ export interface ProductTaskRecordVO {
   /**
    * 结束时间
    */
-  endtime?: Date
-  /**
-   * ID;生产任务执行记录
-   */
-  id?: number
+  endtime?: string
   /**
    * 执行日期
    */
-  operateDate?: Date
+  operateDate?: string
   /**
    * 执行人
    */
@@ -248,7 +240,7 @@ export interface ProductTaskRecordVO {
   /**
    * 电站id
    */
-  psId?: number
+  psId?: string
   /**
    * 电站名称
    */
@@ -256,7 +248,7 @@ export interface ProductTaskRecordVO {
   /**
    * 任务执行记录结果
    */
-  recordResultList?: ProductTaskRecordResultVO[]
+  recordResultList: ProductTaskRecordResultVO[]
   /**
    * 备注
    */
@@ -264,7 +256,7 @@ export interface ProductTaskRecordVO {
   /**
    * 开始时间
    */
-  starttime?: Date
+  starttime?: string
   /**
    * 状态 0 保存 1 提交
    */
@@ -299,15 +291,15 @@ export interface ProductTaskRecordResultVO {
   /**
    * ID;生产工作任务执行记录结果表
    */
-  id?: number
+  id?: string
   /**
    * 工作任务项表id;工作任务项表id(product_task_item表id)
    */
-  itemId?: number
+  itemId?: string
   /**
    * 工作任务执行记录id;工作任务执行记录id(product_task_record表id)
    */
-  recordId?: number
+  recordId?: string
   /**
    * 备注
    */
@@ -327,7 +319,11 @@ export interface ProductTaskRecordResultVO {
   /**
    * 工作任务表id;
    */
-  taskId?: number
+  taskId?: string
+  /**
+   * 是否拍摄
+   */
+  cameraActive?: boolean
 }
 
 export interface ProductTaskQuery extends PageQuery {

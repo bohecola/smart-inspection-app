@@ -1,5 +1,5 @@
 import type { AxiosPromise, AxiosRequestConfig } from 'axios'
-import type { ProductTaskQuery, ProductTaskVO } from './types'
+import type { ProductTaskQuery, ProductTaskRecordVO, ProductTaskVO } from './types'
 import request from '@/service/request'
 
 // 查询列表
@@ -12,6 +12,14 @@ export function listProductTask(query: ProductTaskQuery, config?: AxiosRequestCo
   })
 }
 
+// 获取生产任务执行记录模板（新增）
+export function getProductTaskRecordTemp(taskId: string): AxiosPromise<ProductTaskRecordVO> {
+  return request({
+    url: `/ptms/pad/data/productTask/getProductTaskRecordTemp/${taskId}`,
+    method: 'get',
+  })
+}
+
 // 任务详情
 export function getProductTaskInfo(id: string): AxiosPromise<ProductTaskVO> {
   return request({
@@ -21,7 +29,7 @@ export function getProductTaskInfo(id: string): AxiosPromise<ProductTaskVO> {
 }
 
 // 处理执行
-export function doExecute(data: ProductTaskVO) {
+export function doExecute(data: ProductTaskRecordVO) {
   return request({
     url: '/ptms/pad/data/productTask/dealTask',
     method: 'post',

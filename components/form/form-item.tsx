@@ -1,21 +1,24 @@
 import type { PropsWithChildren } from 'react'
 import type { IFormControlProps } from '@/components/ui/form-control'
+import { View } from 'react-native'
 import { FormControl, FormControlError, FormControlErrorText, FormControlHelper, FormControlHelperText, FormControlLabel, FormControlLabelText } from '@/components/ui/form-control'
 
-type FormItemProps = PropsWithChildren<{
+export type FormItemProps = PropsWithChildren<{
   label?: string
+  labelSuffix?: React.ReactNode
   helperText?: string
   errorText?: string
 } & IFormControlProps>
 
 export function FormItem(props: FormItemProps) {
-  const { label, children, helperText, errorText, ...rest } = props
+  const { label, labelSuffix, children, helperText, errorText, ...rest } = props
 
   return (
     <FormControl {...rest}>
       {label && (
-        <FormControlLabel>
+        <FormControlLabel className="flex-row items-center">
           <FormControlLabelText>{label}</FormControlLabelText>
+          {labelSuffix && <View className="ml-1">{labelSuffix}</View>}
         </FormControlLabel>
       )}
       {children}

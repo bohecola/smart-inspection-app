@@ -1,7 +1,7 @@
 import type { IInputFieldProps } from '@/components/ui/input'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 
-interface MyInputProps extends IInputFieldProps {
+export interface MyInputProps extends IInputFieldProps {
   isDisabled?: boolean
   variant?: 'underlined' | 'outline' | 'rounded'
   prefixIcon?: React.ElementType

@@ -29,7 +29,7 @@ export default function SignIn() {
   const toast = useAppToast()
   const user = useUserStore()
 
-  const { appTitle, clientId } = useGlobSettings()
+  const { appName, clientId } = useGlobSettings()
   const { showPassword, toggle } = useShowPassword()
   const { captchaImage, captchaEnabled, uuid, getCaptcha } = useCaptcha()
 
@@ -93,7 +93,7 @@ export default function SignIn() {
             source={logoImage}
             alt="Logo"
           />
-          <Text>{appTitle}</Text>
+          <Text>{appName}</Text>
         </View>
 
         <Controller

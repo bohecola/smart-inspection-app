@@ -2,6 +2,6 @@ export interface GlobConfig {
   rsaPublicKey: string
   apiUrl: string
   apiUrlPrefix: string
-  appTitle: string
+  appName: string
   clientId: string
 }

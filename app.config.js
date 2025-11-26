@@ -1,45 +1,25 @@
-const IS_DEV = process.env.APP_VARIANT === 'development'
-const IS_PREVIEW = process.env.APP_VARIANT === 'preview'
-
-function getUniqueIdentifier() {
-  if (IS_DEV) {
-    return 'com.bohecola.smartinspectionapp.dev'
-  }
-
-  if (IS_PREVIEW) {
-    return 'com.bohecola.smartinspectionapp.preview'
-  }
-
-  return 'com.bohecola.smartinspectionapp'
-}
-
-function getAppName() {
-  if (IS_DEV) {
-    return 'Smart Inspection (Dev)'
-  }
-
-  if (IS_PREVIEW) {
-    return 'Smart Inspection (Preview)'
-  }
-
-  return 'Smart Inspection'
-}
+const { EXPO_PUBLIC_APP_NAME, APP_UNIQUE_IDENTIFIER } = process.env
 
 export default ({ config }) => ({
   ...config,
-  name: getAppName(),
+  name: EXPO_PUBLIC_APP_NAME,
   ios: {
     ...config.ios,
-    bundleIdentifier: getUniqueIdentifier(),
+    bundleIdentifier: APP_UNIQUE_IDENTIFIER,
   },
   android: {
     ...config.android,
-    package: getUniqueIdentifier(),
+    package: APP_UNIQUE_IDENTIFIER,
   },
-  updates: {
-    url: 'https://u.expo.dev/c6f86fa7-3848-4c35-97e7-80894d6642a8',
-  },
-  runtimeVersion: {
-    policy: 'appVersion',
-  },
+  plugins: [
+    ...config.plugins,
+    [
+      'expo-camera',
+      {
+        cameraPermission: `允许${EXPO_PUBLIC_APP_NAME}访问相机以拍摄照片和视频`,
+        microphonePermission: `允许${EXPO_PUBLIC_APP_NAME}访问麦克风以录制视频声音`,
+        recordAudioAndroid: true,
+      },
+    ],
+  ],
 })

@@ -2,13 +2,13 @@ import type { GestureResponderEvent } from 'react-native'
 import Entypo from '@expo/vector-icons/Entypo'
 import { Pressable } from '@/components/ui/pressable'
 
-interface CameraDecoProps {
+export interface CameraDecoProps {
   active?: boolean
   disabled?: boolean
   onPress?: (event: GestureResponderEvent) => void
 }
 
-export default function CameraDeco(props: CameraDecoProps) {
+export function CameraDeco(props: CameraDecoProps) {
   const { active, disabled, onPress } = props
 
   return (

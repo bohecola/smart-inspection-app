@@ -1,7 +1,6 @@
 import type { ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import dayjs from 'dayjs'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { debounce } from 'lodash-es'
 import { PlusIcon } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
@@ -32,9 +31,9 @@ export default function ProdDetail() {
     setLoading(false)
   }
 
-  const handleHeaderRightPress = debounce(() => {
+  const handleHeaderRightPress = () => {
     router.push(`/prod/${id}/add-record`)
-  }, 300)
+  }
 
   useEffect(() => {
     fetchData(id)

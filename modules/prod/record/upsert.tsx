@@ -1,24 +1,24 @@
 import type { SubmitHandler } from 'react-hook-form'
-import type { RecordForm } from './form'
+import type { RecordForm } from './helper'
 import type { ProductTaskRecordResultVO } from '@/api/ptms/task/productTask/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { useLocalSearchParams } from 'expo-router'
-import { isEmpty } from 'lodash-es'
 import { CalendarIcon, UserIcon } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
 import { MyButton } from '@/components/button'
+import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
+import { FieldRenderer } from '@/components/field-renderer'
 import { FormItem } from '@/components/form'
-import { MyInputNumber } from '@/components/input-number'
 import { useAppToast } from '@/components/toast'
-import { Textarea, TextareaInput } from '@/components/ui/textarea'
+import { Text } from '@/components/ui/text'
+import { DATA_TYPE_MAP } from '@/enums'
 import { useUserStore } from '@/store/user'
-import CameraDeco from '../components/camera-deco'
-import { recordSchema, useIsAddOrEditRoute } from './form'
+import { recordSchema, useIsAddOrEditRoute } from './helper'
 
 export default function RecordUpsert() {
   const { id } = useLocalSearchParams() as Record<string, string>
@@ -68,14 +68,10 @@ export default function RecordUpsert() {
     update(index, { ...item, cameraActive: !item.cameraActive })
   }
 
-  useEffect(() => {
-
-  }, [])
-
   return (
     <View className="flex-1 bg-background-50 gap-2 pb-safe">
       {loading
-        ? <ActivityIndicator />
+        ? <ActivityIndicator className="mt-4" />
         : (
             <>
               <ScrollView>
@@ -100,43 +96,54 @@ export default function RecordUpsert() {
                 <View className="px-4 gap-3">
                   {fields.map((item, index) => {
                     return (
-                      <Controller
+                      <View
                         key={item.itemId}
-                        control={control}
-                        name={`recordResultList.${index}.result`}
-                        render={({ field: { value, onChange }, fieldState: { error } }) => (
-                          <FormItem
-                            label={`${index + 1}. ${item.description}`}
-                            className=" p-4 bg-background-0 rounded-lg"
-                            isInvalid={!!error}
-                            errorText={error?.message}
-                            labelSuffix={(
-                              <CameraDeco
-                                disabled={item.capture === 'Y'}
-                                active={item.cameraActive}
-                                onPress={() => onCameraPress(item, index)}
-                              />
-                            )}
-                          >
-                            {item.dataType === '0' && (
-                              <Textarea>
-                                <TextareaInput
-                                  placeholder={isEmpty(item.remark) ? `请输入${item.description}` : item.remark}
-                                  value={value}
+                        className="p-4 bg-background-0 rounded-lg gap-2"
+                      >
+                        <Controller
+                          control={control}
+                          name={`recordResultList.${index}.result`}
+                          render={({ field: { value, onChange }, fieldState: { error } }) => (
+                            <FormItem
+                              label={`${index + 1}. ${item.description}`}
+                              isInvalid={!!error}
+                              errorText={error?.message}
+                              labelSuffix={(
+                                <CameraDeco
+                                  disabled={item.capture === 'Y'}
+                                  active={item.cameraActive}
+                                  onPress={() => onCameraPress(item, index)}
                                 />
-                              </Textarea>
-                            )}
-                            {item.dataType === '1' && (
-                              <MyInputNumber
-                                placeholder={item.remark}
+                              )}
+                              helperText={item.dataType === '2' ? '是否正常' : undefined}
+                            >
+                              <FieldRenderer
+                                type={DATA_TYPE_MAP[item.dataType]}
                                 value={value}
-                                onChangeText={onChange}
-
+                                data={item}
+                                onChange={onChange}
                               />
+                            </FormItem>
+                          )}
+                        />
+
+                        {item.cameraActive && (
+                          <Controller
+                            control={control}
+                            name={`recordResultList.${index}.files`}
+                            render={({ field: { value, onChange }, fieldState: { error } }) => (
+                              <FormItem
+                                isInvalid={!!error}
+                                errorText={error?.message}
+                              >
+                                <View>
+                                  <Text>拍摄</Text>
+                                </View>
+                              </FormItem>
                             )}
-                          </FormItem>
+                          />
                         )}
-                      />
+                      </View>
                     )
                   })}
                 </View>

@@ -130,7 +130,7 @@ cssInterop(PrimitiveIcon, {
   },
 });
 
-type ISelectProps = VariantProps<typeof selectStyle> &
+export type ISelectProps = VariantProps<typeof selectStyle> &
   React.ComponentProps<typeof UISelect> & { className?: string };
 
 const Select = React.forwardRef<

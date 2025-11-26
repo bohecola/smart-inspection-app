@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 import type { IButtonProps } from '@/components/ui/button'
 import { Button, ButtonIcon, ButtonSpinner, ButtonText } from '@/components/ui/button'
 
-type MyButtonProps = PropsWithChildren<IButtonProps & {
+export type MyButtonProps = PropsWithChildren<IButtonProps & {
   loading?: boolean
   prefixIcon?: React.ElementType
   suffixIcon?: React.ElementType

@@ -22,7 +22,7 @@ const switchStyle = tva({
   },
 });
 
-type ISwitchProps = React.ComponentProps<typeof UISwitch> &
+export type ISwitchProps = React.ComponentProps<typeof UISwitch> &
   VariantProps<typeof switchStyle>;
 const Switch = React.forwardRef<
   React.ComponentRef<typeof UISwitch>,

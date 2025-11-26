@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash-es'
 import { create } from 'zustand'
 
-interface DictState {
+export interface DictState {
   dict: Array<{
     key: string
     value: DictDataOption[]

@@ -2,9 +2,9 @@ import { deleteItemAsync, getItem, setItem } from 'expo-secure-store'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-type ColorMode = 'light' | 'dark' | 'system'
+export type ColorMode = 'light' | 'dark' | 'system'
 
-interface AppState {
+export interface AppState {
   colorMode: ColorMode
   color: string
   backgroundColor: string

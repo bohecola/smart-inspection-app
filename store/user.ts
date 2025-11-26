@@ -5,7 +5,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { person, userLogout } from '@/api/comm'
 
-interface UserState {
+export interface UserState {
   token: string
   roles: string[]
   permissions: string[]
@@ -39,13 +39,12 @@ export const useUserStore = create(persist<UserState>(set => ({
   },
   logout: async () => {
     await userLogout()
-    set(state => ({
-      ...state,
+    set({
       token: undefined,
       info: null,
       roles: [],
       permissions: [],
-    }))
+    })
   },
 }), {
   name: 'user-store',

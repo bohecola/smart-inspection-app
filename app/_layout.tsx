@@ -1,3 +1,4 @@
+import { useCameraPermissions, useMediaLibraryPermissions } from 'expo-image-picker'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isNil } from 'lodash-es'
@@ -22,6 +23,25 @@ export default function RootLayout() {
   const { token } = useUserStore()
 
   const { colorMode, color, backgroundColor, setColorMode } = useAppStore()
+
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions()
+  const [mediaLibraryPermission, requestMediaLibraryPermission] = useMediaLibraryPermissions()
+
+  if (!cameraPermission) {
+    return null
+  }
+
+  if (!mediaLibraryPermission) {
+    return null
+  }
+
+  if (!cameraPermission.granted) {
+    requestCameraPermission()
+  }
+
+  if (!mediaLibraryPermission.granted) {
+    requestMediaLibraryPermission()
+  }
 
   return (
     <GluestackUIProvider mode={colorMode}>
@@ -60,6 +80,7 @@ export default function RootLayout() {
             >
             </Icon>
           </Fab>
+
         </React.Fragment>
       </DialogProvider>
     </GluestackUIProvider>

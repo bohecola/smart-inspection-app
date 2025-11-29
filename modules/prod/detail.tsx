@@ -1,12 +1,13 @@
 import type { ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import dayjs from 'dayjs'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { PlusIcon } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
 import { getProductTaskInfo } from '@/api/ptms/task/productTask'
 import { Empty } from '@/components/empty'
 import { LinearGradientTag } from '@/components/tag'
+import { useAppToast } from '@/components/toast'
 import { Card } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
@@ -15,6 +16,8 @@ import { selectDictLabel, useDict } from '@/utils'
 
 export default function ProdDetail() {
   const router = useRouter()
+
+  const toast = useAppToast()
 
   const { id } = useLocalSearchParams() as Record<string, string>
 
@@ -32,19 +35,29 @@ export default function ProdDetail() {
   }
 
   const handleHeaderRightPress = () => {
+    const currentDate = dayjs().format('YYYY-MM-DD')
+
+    const isExistTodayRecord = detail?.taskRecordList?.some(item => dayjs(item.operateDate).format('YYYY-MM-DD') === currentDate)
+
+    if (detail?.cycel === '1' && isExistTodayRecord) {
+      return toast.warning('逐日执行周期下，今日已有记录')
+    }
+
     router.push(`/prod/${id}/add-record`)
   }
 
-  useEffect(() => {
-    fetchData(id)
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      fetchData(id)
+    }, [id]),
+  )
 
   return (
     <>
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable onPress={handleHeaderRightPress}>
+            <Pressable disabled={loading} onPress={handleHeaderRightPress}>
               <Icon size="xl" as={PlusIcon} />
             </Pressable>
           ),

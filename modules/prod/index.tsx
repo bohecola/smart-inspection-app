@@ -52,7 +52,7 @@ export default function Prod() {
     setQuery({ ...query, padStatus: item.data, pageNum: 1 })
   }
 
-  // 点击完成
+  // 搜索框编辑后点击完成
   const onSubmitEditing = () => {
     resetListState()
     load()

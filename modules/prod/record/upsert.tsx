@@ -3,17 +3,19 @@ import type { RecordForm } from './helper'
 import type { ProductTaskRecordResultVO } from '@/api/ptms/task/productTask/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { isNil } from 'lodash-es'
 import { CalendarIcon, UserIcon } from 'lucide-react-native'
 import { useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
-import { getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
+import { doExecute, getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
 import { MyButton } from '@/components/button'
 import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
 import { FieldRenderer } from '@/components/field-renderer'
 import { FormItem } from '@/components/form'
+import { ImagePicker } from '@/components/image-picker'
 import { useAppToast } from '@/components/toast'
 import { Text } from '@/components/ui/text'
 import { DATA_TYPE_MAP } from '@/enums'
@@ -21,50 +23,80 @@ import { useUserStore } from '@/store/user'
 import { recordSchema, useIsAddOrEditRoute } from './helper'
 
 export default function RecordUpsert() {
+  const router = useRouter()
+
   const { id } = useLocalSearchParams() as Record<string, string>
 
   const { info } = useUserStore()
 
   const { isAdd } = useIsAddOrEditRoute()
 
-  const { show } = useAppToast()
+  const { show, success } = useAppToast()
 
   const currentDate = dayjs().format('YYYY-MM-DD')
 
   const [loading, setLoading] = useState(false)
 
-  const { control, formState: { errors }, register, trigger, handleSubmit } = useForm<RecordForm>({
+  const { control, getValues, handleSubmit } = useForm<RecordForm>({
+    // 初始化表单数据
     defaultValues: async () => {
       setLoading(true)
-      const { data } = await getProductTaskRecordTemp(id)
-        .finally(() => setLoading(false))
-
-      const recordResultList = data.recordResultList.map(item => ({
-        ...item,
-        cameraActive: item.capture === 'Y',
-      }))
-
-      Object.assign(data, { operator: info.nickName, operateDate: currentDate, recordResultList })
-
-      return data
+      try {
+        if (isAdd) {
+          // 拉取远程模版
+          const { data } = await getProductTaskRecordTemp(id)
+          // 初始化相机是否可以拍摄状态
+          const recordResultList = data.recordResultList.map(item => ({
+            ...item,
+            cameraActive: item.capture === 'Y',
+          }))
+          // 初始化执行人、执行日期、任务项列表
+          Object.assign(data, { operator: info.nickName, operateDate: currentDate, recordResultList })
+          return data
+        }
+      }
+      catch (error) {
+        console.error(error)
+      }
+      finally {
+        setLoading(false)
+      }
     },
     resolver: zodResolver(recordSchema),
-    mode: 'all',
+    mode: 'onSubmit',
   })
 
-  const { fields, append, remove, update } = useFieldArray({ control, name: 'recordResultList' })
+  // 任务项列表
+  const { fields, update } = useFieldArray({ control, name: 'recordResultList' })
+
+  // 保存
+  const onSave: SubmitHandler<RecordForm> = async (data) => {
+    const { msg } = await doExecute({ ...data, status: '0' })
+    success(msg)
+    router.back()
+  }
 
   // 提交
-  const onSubmit: SubmitHandler<RecordForm> = (data) => {
-    console.log('提交数据', data)
+  const onSubmit: SubmitHandler<RecordForm> = async (data) => {
+    const { msg } = await doExecute({ ...data, status: '1' })
+    success(msg)
+    router.back()
   }
 
   // 相机图标点击
   const onCameraPress = (item: ProductTaskRecordResultVO, index: number) => {
+    // 必须拍摄
     if (item.capture === 'Y') {
-      return show('当前任务必须进行拍摄')
+      return show(`当前任务项不能取消拍摄`)
     }
 
+    // 可选拍摄
+    const currentItem = getValues('recordResultList')[index]
+    if (!isNil(currentItem.files) && currentItem.files !== '') {
+      return show(`若要取消拍摄，请先删除【${currentItem?.description}】下的拍摄文件 `)
+    }
+
+    // 更新相机是否可以拍摄状态
     update(index, { ...item, cameraActive: !item.cameraActive })
   }
 
@@ -75,6 +107,7 @@ export default function RecordUpsert() {
         : (
             <>
               <ScrollView>
+                {/* 执行人信息 */}
                 <CellGroup inset className="py-4">
                   <Controller
                     control={control}
@@ -83,7 +116,6 @@ export default function RecordUpsert() {
                       <Cell icon={UserIcon} title="执行人" value={value}></Cell>
                     )}
                   />
-
                   <Controller
                     control={control}
                     name="operateDate"
@@ -93,6 +125,7 @@ export default function RecordUpsert() {
                   />
                 </CellGroup>
 
+                {/* 任务项列表 */}
                 <View className="px-4 gap-3">
                   {fields.map((item, index) => {
                     return (
@@ -100,20 +133,27 @@ export default function RecordUpsert() {
                         key={item.itemId}
                         className="p-4 bg-background-0 rounded-lg gap-2"
                       >
+                        {/* 任务项内容 */}
                         <Controller
                           control={control}
                           name={`recordResultList.${index}.result`}
                           render={({ field: { value, onChange }, fieldState: { error } }) => (
+                            // 表单项
                             <FormItem
                               label={`${index + 1}. ${item.description}`}
                               isInvalid={!!error}
                               errorText={error?.message}
                               labelSuffix={(
-                                <CameraDeco
-                                  disabled={item.capture === 'Y'}
-                                  active={item.cameraActive}
-                                  onPress={() => onCameraPress(item, index)}
-                                />
+                                <View className="flex-row items-center gap-2">
+                                  {/* 相机图标 */}
+                                  <CameraDeco
+                                    disabled={item.capture === 'Y'}
+                                    active={item.cameraActive}
+                                    onPress={() => onCameraPress(item, index)}
+                                  />
+
+                                  <Text></Text>
+                                </View>
                               )}
                               helperText={item.dataType === '2' ? '是否正常' : undefined}
                             >
@@ -127,6 +167,7 @@ export default function RecordUpsert() {
                           )}
                         />
 
+                        {/* 相机拍摄 */}
                         {item.cameraActive && (
                           <Controller
                             control={control}
@@ -136,9 +177,11 @@ export default function RecordUpsert() {
                                 isInvalid={!!error}
                                 errorText={error?.message}
                               >
-                                <View>
-                                  <Text>拍摄</Text>
-                                </View>
+                                <ImagePicker
+                                  value={value}
+                                  onChange={onChange}
+                                  autoUpload
+                                />
                               </FormItem>
                             )}
                           />
@@ -153,7 +196,7 @@ export default function RecordUpsert() {
                 <MyButton
                   className="flex-1"
                   variant="outline"
-                  onPress={handleSubmit(onSubmit)}
+                  onPress={handleSubmit(onSave)}
                 >
                   保存
                 </MyButton>

@@ -4,6 +4,7 @@ import { MyInputNumber } from '@/components/input-number'
 import { MySelect } from '@/components/select'
 import { MySwitch } from '@/components/switch'
 import { Textarea, TextareaInput } from '@/components/ui/textarea'
+import { Uploader } from '@/components/uploader'
 import { transformOptions } from '@/utils'
 
 interface Props {
@@ -21,7 +22,11 @@ export function FieldRenderer(props: Props) {
       return (
         <Textarea>
           <TextareaInput
-            placeholder={isEmpty(data.remark) ? `请输入${data.description}` : data.remark}
+            placeholder={
+              isEmpty(data.remark)
+                ? `请输入${data.description}`
+                : data.remark
+            }
             value={value}
             onChangeText={onChange}
           />
@@ -52,6 +57,13 @@ export function FieldRenderer(props: Props) {
           onValueChange={onChange}
           options={transformOptions(data.remark)}
           placeholder="请选择"
+        />
+      )
+    case 'file':
+      return (
+        <Uploader
+          value={value}
+          onChange={onChange}
         />
       )
     default:

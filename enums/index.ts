@@ -3,5 +3,5 @@ export const DATA_TYPE_MAP: Record<string, 'textarea' | 'input-number' | 'switch
   1: 'input-number',
   2: 'switch',
   3: 'select',
-  4: 'file',
+  5: 'file',
 }

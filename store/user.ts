@@ -1,9 +1,9 @@
 import type { UserVO } from '@/api/system/user/types'
-import { deleteItemAsync, getItem, setItem } from 'expo-secure-store'
-import { isEmpty } from 'lodash'
+import { isEmpty } from 'lodash-es'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { person, userLogout } from '@/api/comm'
+import { mmkvStorage } from '@/utils/mmkv'
 
 export interface UserState {
   token: string
@@ -48,9 +48,5 @@ export const useUserStore = create(persist<UserState>(set => ({
   },
 }), {
   name: 'user-store',
-  storage: createJSONStorage(() => ({
-    setItem,
-    getItem,
-    removeItem: deleteItemAsync,
-  })),
+  storage: createJSONStorage(() => mmkvStorage),
 }))

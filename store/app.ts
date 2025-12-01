@@ -1,6 +1,6 @@
-import { deleteItemAsync, getItem, setItem } from 'expo-secure-store'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { mmkvStorage } from '@/utils/mmkv'
 
 export type ColorMode = 'light' | 'dark' | 'system'
 
@@ -27,9 +27,5 @@ export const useAppStore = create(persist<AppState>(set => ({
   },
 }), {
   name: 'app-store',
-  storage: createJSONStorage(() => ({
-    setItem,
-    getItem,
-    removeItem: deleteItemAsync,
-  })),
+  storage: createJSONStorage(() => mmkvStorage),
 }))

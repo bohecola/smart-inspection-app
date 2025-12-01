@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 import { isNil } from 'lodash-es'
 import React from 'react'
 import { DialogProvider } from '@/components/dialog'
+import { GlobalLoading } from '@/components/loading'
 import { useAppToast } from '@/components/toast'
 import { Fab } from '@/components/ui/fab'
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
@@ -63,6 +64,7 @@ export default function RootLayout() {
               <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
               <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
               <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
+              <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
               <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
               <Stack.Screen name="inspec/[id]" options={{ title: '巡检任务详情' }} />
               <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
@@ -83,6 +85,8 @@ export default function RootLayout() {
 
         </React.Fragment>
       </DialogProvider>
+
+      <GlobalLoading />
     </GluestackUIProvider>
   )
 }

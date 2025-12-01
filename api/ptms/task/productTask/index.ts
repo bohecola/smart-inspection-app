@@ -19,6 +19,13 @@ export function getProductTaskRecordTemp(taskId: string): AxiosPromise<ProductTa
     method: 'get',
   })
 }
+// 查询任务执行记录详情
+export function getProductTaskRecordById(recordId: string): AxiosPromise<ProductTaskRecordVO> {
+  return request({
+    url: `/ptms/pad/data/productTask/getProductTaskRecordById/${recordId}`,
+    method: 'get',
+  })
+}
 
 // 任务详情
 export function getProductTaskInfo(id: string): AxiosPromise<ProductTaskVO> {
@@ -38,7 +45,7 @@ export function doExecute(data: ProductTaskRecordVO) {
 }
 
 // 处理执行完成-逐日
-export function doExecuteDaily(taskId: string) {
+export function dealDoneTask(taskId: string) {
   return request({
     url: `/ptms/pad/data/productTask/dealDoneTask/${taskId}`,
     method: 'post',

@@ -2,13 +2,6 @@ import { usePathname } from 'expo-router'
 import { isEmpty, isNil } from 'lodash-es'
 import z from 'zod'
 
-export function useIsAddOrEditRoute() {
-  const pathname = usePathname()
-  const isAdd = pathname.endsWith('add-record')
-  const isEdit = pathname.endsWith('edit-record')
-  return { isAdd, isEdit }
-}
-
 export const recordSchema = z.object({
   id: z.string().nullish(),
   taskId: z.string().optional(),
@@ -62,3 +55,10 @@ export const recordSchema = z.object({
 })
 
 export type RecordForm = z.infer<typeof recordSchema>
+
+export function useIsAddOrEditRoute() {
+  const pathname = usePathname()
+  const isAdd = pathname.endsWith('add-record')
+  const isEdit = pathname.endsWith('edit-record')
+  return { isAdd, isEdit }
+}

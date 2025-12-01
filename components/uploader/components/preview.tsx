@@ -8,6 +8,7 @@ import { Image } from '@/components/ui/image'
 import { Pressable } from '@/components/ui/pressable'
 import { Spinner } from '@/components/ui/spinner'
 import { Text } from '@/components/ui/text'
+import { useUploaderContext } from '../context'
 import { getFilePreviewType } from '../helper'
 
 // 文件预览渲染器
@@ -80,6 +81,8 @@ function FilePreviewRenderer({ item, type }: FilePreviewRendererProps) {
 
 // 文件预览组件
 export function UploaderPreview(props: UploaderPreviewProps) {
+  const { isDisabled } = useUploaderContext()
+
   const { item, onPress, onDelete } = props
 
   // 获取文件预览类型
@@ -121,7 +124,7 @@ export function UploaderPreview(props: UploaderPreviewProps) {
         )}
 
         {/* 删除按钮 */}
-        {item.status !== 'uploading' && item.deletable && (
+        {item.status !== 'uploading' && item.deletable && !isDisabled && (
           <Pressable
             className="absolute top-0 right-0 p-1 w-5 h-5 bg-black/80 items-center justify-center"
             onPress={onDelete}

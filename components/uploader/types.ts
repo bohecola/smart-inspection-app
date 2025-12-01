@@ -35,6 +35,7 @@ export interface UploaderProps {
   showTip?: boolean
   auto?: boolean
   showUploadButton?: boolean
+  isDisabled?: boolean
   onChange?: (value: string | string[]) => void
   onFileListChange?: (value: UploaderFileListItem[]) => void
   onSelectFiles?: (value: DocumentPickerAsset[]) => void

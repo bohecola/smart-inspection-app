@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import type { IButtonProps } from '@/components/ui/button'
-import { Button, ButtonIcon, ButtonSpinner, ButtonText } from '@/components/ui/button'
+import { Button, ButtonIcon, ButtonSpinner } from '@/components/ui/button'
 
 export type MyButtonProps = PropsWithChildren<IButtonProps & {
   loading?: boolean
@@ -12,9 +12,9 @@ export function MyButton(props: MyButtonProps) {
   const { loading = false, children, prefixIcon, suffixIcon, ...rest } = props
   return (
     <Button isDisabled={loading} {...rest}>
-      {loading && <ButtonSpinner color="gray" />}
+      {loading && <ButtonSpinner color={rest.variant === 'outline' ? 'black' : 'gray'} />}
       {prefixIcon && <ButtonIcon as={prefixIcon} />}
-      <ButtonText>{children}</ButtonText>
+      {children}
       {suffixIcon && <ButtonIcon as={suffixIcon} />}
     </Button>
   )

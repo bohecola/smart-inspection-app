@@ -1,5 +1,6 @@
 import type { ImagePickerAsset } from 'expo-image-picker'
 import type { UploaderFileListItem, UploaderRef } from '@/components/uploader/types'
+import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import { launchCameraAsync } from 'expo-image-picker'
 import { CameraIcon, ImageIcon, VideoIcon } from 'lucide-react-native'
 import { useRef, useState } from 'react'
@@ -18,16 +19,20 @@ export interface ImagePickerProps {
   valueType?: 'string' | 'array'
   limit?: number
   autoUpload?: boolean
+  isDisabled?: boolean
   onTakeMediaSuccess?: (value: ImagePickerAsset[]) => void
   onChange?: (value: string | string[]) => void
 }
 
 export function ImagePicker(props: ImagePickerProps) {
+  const { isDisabled: isFormControlDisabled, isInvalid } = useFormControlContext()
+
   const {
     value,
     limit = 10,
     autoUpload = false,
     valueType = 'string',
+    isDisabled = isFormControlDisabled,
     onTakeMediaSuccess,
     onChange,
   } = props
@@ -152,31 +157,36 @@ export function ImagePicker(props: ImagePickerProps) {
               showUploadButton={false}
               showTip={false}
               valueType={valueType}
+              isDisabled={isDisabled}
               onChange={onUploaderChange}
               onFileListChange={onUploaderFileListChange}
             />
           )
         : null}
 
-      <Pressable onPress={() => setShowActionsheet(true)}>
-        {({ pressed }) => (
-          <View className={cn(
-            'w-20 h-20 border rounded border-outline-200 items-center justify-center',
-            pressed ? 'bg-outline-100' : '',
+      <View className="w-20 h-20">
+        <Pressable disabled={isDisabled} onPress={() => setShowActionsheet(true)}>
+          {({ pressed }) => (
+            <View className={cn(
+              'w-full h-full border rounded border-outline-200 items-center justify-center',
+              pressed ? 'bg-outline-100' : '',
+              isDisabled ? 'bg-outline-50' : '',
+              isInvalid ? 'border-error-700' : '',
+            )}
+            >
+              <Icon as={CameraIcon} size="xl" className="text-outline-400 stroke-[1.5px]" />
+              <Text className="text-xs text-outline-400 mt-1">拍摄上传</Text>
+              <Text className="text-xs text-outline-400 mt-1">
+                (
+                {uploadFileList.length}
+                /
+                {limit}
+                )
+              </Text>
+            </View>
           )}
-          >
-            <Icon as={CameraIcon} size="xl" className="text-outline-400 stroke-[1.5px]" />
-            <Text className="text-xs text-outline-400 mt-1">拍摄上传</Text>
-            <Text className="text-xs text-outline-400 mt-1">
-              (
-              {uploadFileList.length}
-              /
-              {limit}
-              )
-            </Text>
-          </View>
-        )}
-      </Pressable>
+        </Pressable>
+      </View>
 
       <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
         <ActionsheetBackdrop />

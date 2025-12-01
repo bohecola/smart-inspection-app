@@ -12,6 +12,7 @@ import { MyButton } from '@/components/button'
 import { FormItem } from '@/components/form'
 import { MyInput } from '@/components/input'
 import { useAppToast } from '@/components/toast'
+import { ButtonText } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { FormControl } from '@/components/ui/form-control'
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icon'
@@ -167,7 +168,7 @@ export default function SignIn() {
           disabled={loading}
           onPress={handleSubmit(onSubmit)}
         >
-          登录
+          <ButtonText>登录</ButtonText>
         </MyButton>
       </Card>
     </FormControl>

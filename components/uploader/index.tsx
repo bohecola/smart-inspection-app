@@ -1,5 +1,6 @@
 import type { ViewerRef } from './components/viewer'
 import type { UploadAsset, UploaderFileListItem, UploaderProps, UploaderRef } from './types'
+import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import { getDocumentAsync } from 'expo-document-picker'
 import { getThumbnailAsync } from 'expo-video-thumbnails'
 import { isArray, isNil } from 'lodash-es'
@@ -13,9 +14,12 @@ import { HelperText } from './components/helper-text'
 import { UploaderPreview } from './components/preview'
 import { UploadButton } from './components/upload-button'
 import { Viewer } from './components/viewer'
+import { UploaderContext } from './context'
 import { allTypeEnum, getValue, isImageType, isVideoType } from './helper'
 
 export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
+  const { isDisabled: isFormControlDisabled, isInvalid } = useFormControlContext()
+
   const {
     value,
     valueType = 'string',
@@ -26,6 +30,7 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
     auto = true,
     showTip = false,
     showUploadButton = true,
+    isDisabled = isFormControlDisabled,
     onChange,
     onFileListChange,
     onSelectFiles,
@@ -261,28 +266,30 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
   }))
 
   return (
-    <View>
-      {/* 文件列表 */}
-      <View className="flex-row flex-wrap">
-        {fileList.map((item, index) => (
-          <UploaderPreview
-            key={item.ossId ?? item.url}
-            item={item}
-            onDelete={() => handleDeleteFile(item, index)}
-            onPress={() => handlePreviewFile(item)}
-          />
-        ))}
+    <UploaderContext.Provider value={{ isDisabled, isInvalid }}>
+      <View>
+        {/* 文件列表 */}
+        <View className="flex-row flex-wrap">
+          {fileList.map((item, index) => (
+            <UploaderPreview
+              key={item.ossId ?? item.url}
+              item={item}
+              onDelete={() => handleDeleteFile(item, index)}
+              onPress={() => handlePreviewFile(item)}
+            />
+          ))}
+        </View>
+
+        {/* 上传按钮 */}
+        {showUploadButton && <UploadButton onPress={handleSelectFiles} />}
+
+        {/* 提示信息 */}
+        {showTip && <HelperText fileType={fileType} />}
+
+        {/* 文件预览器 */}
+        <Viewer ref={viewerRef} images={images} />
       </View>
-
-      {/* 上传按钮 */}
-      {showUploadButton && <UploadButton onPress={handleSelectFiles} />}
-
-      {/* 提示信息 */}
-      {showTip && <HelperText fileType={fileType} />}
-
-      {/* 文件预览器 */}
-      <Viewer ref={viewerRef} images={images} />
-    </View>
+    </UploaderContext.Provider>
   )
 },
 )

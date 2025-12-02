@@ -22,13 +22,9 @@ import { selectDictLabel, useDict } from '@/utils'
 
 export default function ProdDetail() {
   const router = useRouter()
-
   const toast = useAppToast()
-
   const { id } = useLocalSearchParams() as Record<string, string>
-
   const { showLoading, hideLoading } = useLoading()
-
   const { showConfirmDialog } = useDialog()
 
   const { product_task_cycel } = useDict('product_task_cycel')
@@ -54,7 +50,6 @@ export default function ProdDetail() {
     // 逐月
     if (detail.cycel === '0') {
       const isAlreadyExistMonthRecord = detail.taskRecordList?.length > 0
-
       if (isAlreadyExistMonthRecord) {
         return toast.warning('逐月执行周期下，本月已有记录')
       }
@@ -82,7 +77,6 @@ export default function ProdDetail() {
     if (item.status === '1') {
       return router.push(`/prod/${id}/view-record?recordId=${item.id}`)
     }
-
     // 已保存（进行中）
     if (item.status === '0') {
       return router.push(`/prod/${id}/edit-record?recordId=${item.id}`)
@@ -103,14 +97,16 @@ export default function ProdDetail() {
     if (hasUnsubmitted) {
       return toast.warning('当前任务下存在未提交的执行记录')
     }
-
     // 提示用户确认
     await showConfirmDialog({ description: '确认要完成该任务吗？' })
       .then(async () => {
         showLoading('正在提交数据...')
         const { msg } = await dealDoneTask(detail.id)
         toast.success(msg)
-        router.back()
+        router.dismissTo({
+          pathname: '/prod',
+          params: { refreshSignal: 'true' },
+        })
       })
       .catch(() => {})
       .finally(hideLoading)
@@ -135,7 +131,7 @@ export default function ProdDetail() {
         }}
       />
 
-      <View className="p-2 flex-1 bg-background-50 pb-safe">
+      <View className="p-4 flex-1 bg-background-50 pb-safe">
         {loading
           ? <ActivityIndicator />
           : (

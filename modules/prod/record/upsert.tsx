@@ -145,8 +145,8 @@ export default function RecordUpsert() {
       // 提示保存
       try {
         await showConfirmDialog({ description: '是否保存后再返回？' })
-          .then(() => {
-            handleSubmit(data => doExecuteRequest({ data, status: '0', loadingText: '保存中...' }))()
+          .then(async () => {
+            await handleSubmit(data => doExecuteRequest({ data, status: '0', loadingText: '保存中...' }))()
           })
           .catch(() => {})
       }
@@ -175,7 +175,7 @@ export default function RecordUpsert() {
                   {fields.map((item, index) => {
                     return (
                       <View
-                        key={item._key}
+                        key={item.itemId}
                         className="p-4 bg-background-0 rounded-lg gap-2"
                       >
                         {/* 表单项 */}

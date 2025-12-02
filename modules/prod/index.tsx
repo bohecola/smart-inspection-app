@@ -1,7 +1,8 @@
 import type { ProductTaskQuery, ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import type { TabMenu } from '@/components/tabs'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listProductTask } from '@/api/ptms/task/productTask'
 import { MyInput } from '@/components/input'
@@ -13,6 +14,8 @@ import { useDict } from '@/utils'
 import { Item } from './components/item'
 
 export default function Prod() {
+  const router = useRouter()
+  const params = useLocalSearchParams()
   // Tab 列表
   const tabs: TabMenu<string>[] = [
     { title: '可执行', name: 'can-execute', data: '0' },
@@ -22,6 +25,9 @@ export default function Prod() {
 
   // 当前 Tab
   const [currentTab, setCurrentTab] = useState(tabs[0])
+
+  // FlatList 引用
+  const flatListRef = useRef<FlatList<ProductTaskVO>>(null)
 
   // 字典数据
   const { product_task_state } = useDict('product_task_state')
@@ -68,6 +74,18 @@ export default function Prod() {
     load()
   }, [query.padStatus])
 
+  useEffect(() => {
+    // 检查是否有刷新信号
+    if (params.refreshSignal === 'true') {
+      // 回到顶部
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+      // 刷新
+      onRefresh()
+      // 清除参数
+      router.setParams({ refreshSignal: undefined })
+    }
+  }, [params.refreshSignal])
+
   return (
     <View className="flex-1 bg-background-50 pb-safe">
       <View className="px-4 py-2 bg-background-0">
@@ -88,6 +106,7 @@ export default function Prod() {
       <TabsMenu tabs={tabs} onTabChange={onTabChange} />
 
       <FlatList
+        ref={flatListRef}
         onEndReached={load}
         onEndReachedThreshold={0.2}
         className="p-4"

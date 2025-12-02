@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import type { ColorValue } from 'react-native'
 import { LinearGradient } from '@/components/ui/linear-gradient'
-import { Text } from '@/components/ui/text'
 
 export type Variant = 'blue' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
 
@@ -27,7 +26,7 @@ export function LinearGradientTag({ variant, children, className }: Props) {
       end={[1, 0]}
       colors={GRADUAL_COLORS[variant]}
     >
-      <Text className="text-white">{children}</Text>
+      {children}
     </LinearGradient>
   )
 }

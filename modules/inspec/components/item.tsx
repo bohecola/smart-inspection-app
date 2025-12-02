@@ -4,10 +4,9 @@ import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { View } from 'react-native'
 import { LinearGradientTag } from '@/components/tag'
-import { Card } from '@/components/ui/card'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
-import { selectDictLabel } from '@/utils'
+import { cn, selectDictLabel } from '@/utils'
 
 export function Item({ item, product_task_state }: { item: PatorlTaskVO, product_task_state: DictDataOption[] }) {
   const router = useRouter()
@@ -29,16 +28,22 @@ export function Item({ item, product_task_state }: { item: PatorlTaskVO, product
   return (
     <Pressable onPress={() => handleItemPress(item)}>
       {({ pressed }) => (
-        <Card className={`flex-row gap-1 w-full ${pressed ? 'bg-background-100' : ''}`}>
+        <View className={cn(
+          'w-full min-h-16 p-4 bg-background-0 rounded-md flex-row items-center gap-1',
+          pressed ? 'bg-background-100' : '',
+        )}
+        >
           <View className="flex-[3]">
             <Text>{item.name}</Text>
           </View>
           <View className="flex-1 justify-center items-center">
             <LinearGradientTag variant={variant}>
-              {selectDictLabel(product_task_state, item.status)}
+              <Text className="text-white">
+                {selectDictLabel(product_task_state, item.status)}
+              </Text>
             </LinearGradientTag>
           </View>
-        </Card>
+        </View>
       )}
     </Pressable>
   )

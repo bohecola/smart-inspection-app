@@ -198,7 +198,9 @@ export default function ProdDetail() {
                               variant={item.status === '0' ? 'blue' : 'green'}
                               className="ml-auto"
                             >
-                              {item.status === '0' ? '进行中' : '已完成'}
+                              <Text className="text-white">
+                                {item.status === '0' ? '进行中' : '已完成'}
+                              </Text>
                             </LinearGradientTag>
                           </View>
                         </Card>

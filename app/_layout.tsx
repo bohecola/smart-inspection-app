@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useCameraPermissions, useMediaLibraryPermissions } from 'expo-image-picker'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -28,6 +29,16 @@ export default function RootLayout() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions()
   const [mediaLibraryPermission, requestMediaLibraryPermission] = useMediaLibraryPermissions()
 
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 2, // 失败重试 2 次
+        staleTime: 5 * 60 * 1000, // 5分钟内数据视为新鲜
+        gcTime: 10 * 60 * 1000, // 10分钟后清除缓存
+      },
+    },
+  })
+
   if (!cameraPermission) {
     return null
   }
@@ -46,47 +57,49 @@ export default function RootLayout() {
 
   return (
     <GluestackUIProvider mode={colorMode}>
-      <DialogProvider>
-        <React.Fragment>
-          <StatusBar style="auto" />
+      <QueryClientProvider client={queryClient}>
+        <DialogProvider>
+          <React.Fragment>
+            <StatusBar style="auto" />
 
-          <Stack screenOptions={{
-            headerTitleAlign: 'center',
-            headerTintColor: color,
-            headerStyle: {
-              backgroundColor,
-            },
-          }}
-          >
-            <Stack.Protected guard={!isNil(token)}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
-              <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
-              <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
-              <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
-              <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
-              <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
-              <Stack.Screen name="inspec/[id]" options={{ title: '巡检任务详情' }} />
-              <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
-              <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
-            </Stack.Protected>
-            <Stack.Protected guard={isNil(token)}>
-              <Stack.Screen name="sign-in" options={{ title: '登录' }} />
-            </Stack.Protected>
-          </Stack>
-
-          <Fab className="bottom-28 right-6 z-0" onPress={() => setColorMode(colorMode === 'light' ? 'dark' : 'light')}>
-            <Icon
-              as={colorMode === 'light' ? MoonIcon : SunIcon}
-              className="text-typography-0"
+            <Stack screenOptions={{
+              headerTitleAlign: 'center',
+              headerTintColor: color,
+              headerStyle: {
+                backgroundColor,
+              },
+            }}
             >
-            </Icon>
-          </Fab>
+              <Stack.Protected guard={!isNil(token)}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
+                <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
+                <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
+                <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
+                <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
+                <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
+                <Stack.Screen name="inspec/[id]" options={{ title: '巡检任务详情' }} />
+                <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
+                <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
+              </Stack.Protected>
+              <Stack.Protected guard={isNil(token)}>
+                <Stack.Screen name="sign-in" options={{ title: '登录' }} />
+              </Stack.Protected>
+            </Stack>
 
-        </React.Fragment>
-      </DialogProvider>
+            <Fab className="bottom-28 right-6 z-0" onPress={() => setColorMode(colorMode === 'light' ? 'dark' : 'light')}>
+              <Icon
+                as={colorMode === 'light' ? MoonIcon : SunIcon}
+                className="text-typography-0"
+              >
+              </Icon>
+            </Fab>
 
-      <GlobalLoading />
+          </React.Fragment>
+        </DialogProvider>
+
+        <GlobalLoading />
+      </QueryClientProvider>
     </GluestackUIProvider>
   )
 }

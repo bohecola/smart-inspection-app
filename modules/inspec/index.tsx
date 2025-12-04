@@ -1,5 +1,6 @@
 import type { PatorlTaskQuery, PatorlTaskVO } from '@/api/ptms/task/patorlTask/types'
 import type { TabMenu } from '@/components/tabs'
+import { useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
@@ -9,9 +10,11 @@ import { ListFooterComponent, Separator } from '@/components/list'
 import { TabsMenu } from '@/components/tabs'
 import { useList } from '@/hooks/list'
 import { useDict } from '@/utils'
-import { Item } from './components/item'
+import { Item } from './components/Item'
 
 export default function Inspec() {
+  const router = useRouter()
+
   // Tab 列表
   const tabs: TabMenu<string>[] = [
     { title: '可执行', name: 'can-execute', data: '0' },
@@ -27,43 +30,46 @@ export default function Inspec() {
 
   // 初始查询参数
   const initialQuery: PatorlTaskQuery = {
-    pageSize: 10,
+    pageSize: 15,
     pageNum: 1,
     keyword: undefined,
     padStatus: currentTab.data,
   }
 
   // 列表
-  const { query, data, loading, refreshing, hasMore, error, load, onRefresh, setQuery, resetListState } = useList<PatorlTaskVO, PatorlTaskQuery>({
+  const { query, data, loading, refreshing, hasMore, error, loadMore, reload, onRefresh, setQuery } = useList<PatorlTaskVO, PatorlTaskQuery>({
     initialQuery,
     request: listPatorlTask,
   })
 
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {
-    // 重置列表状态
-    resetListState()
     // 设置当前标签
     setCurrentTab(item)
     // 设置查询参数
     setQuery({ ...query, padStatus: item.data, pageNum: 1 })
   }
 
-  // 点击完成
-  const onSubmitEditing = () => {
-    resetListState()
-    load()
+  const onChangeText = (text: string) => {
+    setQuery({ ...query, keyword: text })
   }
 
-  // 监听输入变化
-  const onChangeText = (text: string) => {
-    setQuery({ ...query, keyword: text, pageNum: 1 })
+  // 点击完成
+  const onSubmitEditing = () => {
+    reload()
+  }
+
+  const onLoad = () => loadMore()
+
+  // 点击任务项
+  const handleItemPress = (item: PatorlTaskVO) => {
+    router.push(`/inspec/${item.id}`)
   }
 
   // 监听状态变化
   useEffect(() => {
-    load()
-  }, [query.padStatus])
+    reload()
+  }, [query.keyword, query.padStatus])
 
   return (
     <View className="flex-1 bg-background-50 pb-safe">
@@ -74,8 +80,8 @@ export default function Inspec() {
           variant="rounded"
           placeholder="请输入工作计划/工作任务"
           value={query.keyword}
-          isDisabled={loading || refreshing}
           onChangeText={onChangeText}
+          isDisabled={loading || refreshing}
           onSubmitEditing={onSubmitEditing}
         />
       </View>
@@ -83,7 +89,7 @@ export default function Inspec() {
       <TabsMenu tabs={tabs} onTabChange={onTabChange} />
 
       <FlatList
-        onEndReached={load}
+        onEndReached={onLoad}
         onEndReachedThreshold={0.2}
         className="p-4"
         data={data}
@@ -93,6 +99,7 @@ export default function Inspec() {
           <Item
             item={item}
             product_task_state={product_task_state}
+            onPress={handleItemPress}
           />
         )}
         refreshControl={(
@@ -106,7 +113,7 @@ export default function Inspec() {
             loading={loading}
             error={error}
             hasMore={hasMore}
-            load={load}
+            load={onLoad}
           />
         )}
       />

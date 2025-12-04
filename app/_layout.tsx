@@ -78,7 +78,11 @@ export default function RootLayout() {
                 <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
                 <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
                 <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
-                <Stack.Screen name="inspec/[id]" options={{ title: '巡检任务详情' }} />
+                <Stack.Screen name="inspec/[id]/index" options={{ title: '巡检任务详情' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/index" options={{ title: '巡检内容' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/add-record" options={{ title: '新增巡检任务执行记录' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/edit-record" options={{ title: '编辑巡检任务执行记录' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/view-record" options={{ title: '查看巡检任务执行记录' }} />
                 <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
                 <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
               </Stack.Protected>

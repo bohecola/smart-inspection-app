@@ -23,98 +23,89 @@ export function useList<T, Q extends PageQuery>(options: Options<T, Q>) {
   const [hasMore, setHasMore] = useState(true)
   const [error, setError] = useState(false)
 
-  function resetListState() {
-    setLoading(false)
-    setRefreshing(false)
-    setHasMore(true)
-    setData([])
-  }
-
-  // 控制器
-  const controllerRef = useRef<AbortController>(null)
+  const abortController = useRef<AbortController>(null)
 
   // 加载数据
-  const load = async () => {
-    if (loading || refreshing || !hasMore) {
-      return false
+  const loadMore = async (isRefreshing: boolean = false) => {
+    if (loading || !hasMore) {
+      return
     }
 
-    // 取消上一次请求
-    controllerRef.current?.abort()
-
-    // 创建新的控制器
-    const controller = new AbortController()
-    controllerRef.current = controller
-
     try {
+      abortController.current?.abort()
+      abortController.current = new AbortController()
+
       setLoading(true)
       setError(false)
 
-      const { rows, total } = await request(query, { signal: controller.signal })
+      const { rows, total } = await request(query, { signal: abortController.current.signal })
 
-      controllerRef.current = null
+      abortController.current = null
 
-      setData((prev) => {
-        const newData = [...prev, ...rows]
+      const currentTotal = data.length + rows.length
 
-        setHasMore(total > newData.length)
-        return newData
-      })
-
+      setData(isRefreshing ? rows : [...data, ...rows])
+      setHasMore(total > currentTotal)
       setQuery({ ...query, pageNum: query.pageNum + 1 })
-
-      setLoading(false)
     }
     catch (error: any) {
-      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+      if (error.code === 'ERR_CANCELED') {
+        console.log('请求被取消')
         return
       }
 
       setError(true)
-      setLoading(false)
       console.error(error)
+    }
+    finally {
+      setLoading(false)
+    }
+  }
+
+  // reload
+  const reload = async () => {
+    try {
+      setData([])
+
+      abortController.current?.abort()
+      abortController.current = new AbortController()
+
+      setLoading(true)
+      setError(false)
+
+      const { rows, total } = await request(Object.assign({}, query, { pageNum: 1 }), { signal: abortController.current.signal })
+
+      abortController.current = null
+
+      const currentTotal = data.length + rows.length
+
+      setData(rows)
+      setHasMore(total > currentTotal)
+      setQuery({ ...query, pageNum: query.pageNum + 1 })
+    }
+    catch (error: any) {
+      if (error.code === 'ERR_CANCELED') {
+        console.log('请求被取消')
+        return
+      }
+
+      setError(true)
+      console.error(error)
+    }
+    finally {
+      setLoading(false)
     }
   }
 
   // 刷新
   const onRefresh = async () => {
-    if (refreshing) {
-      return false
-    }
-
-    // 取消上一次请求
-    controllerRef.current?.abort()
-
-    // 创建新的控制器
-    const controller = new AbortController()
-    controllerRef.current = controller
-
-    try {
-      setData([])
-      setHasMore(true)
-      setRefreshing(true)
-
-      const newQuery = cloneDeep(initialQuery)
-
-      const { rows, total } = await request(newQuery, { signal: controller.signal })
-
-      controllerRef.current = null
-
-      setData(rows)
-      setHasMore(total > rows.length)
-      setQuery({ ...newQuery, pageNum: newQuery.pageNum + 1 })
-
-      setRefreshing(false)
-    }
-    catch (error: any) {
-      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
-        return
-      }
-      setError(true)
-      setRefreshing(false)
-      console.error(error)
-    }
+    setRefreshing(true)
+    setData([])
+    setHasMore(true)
+    setQuery({ ...query, pageNum: 1 })
+    await loadMore(true)
+    setRefreshing(false)
   }
 
-  return { query, data, loading, refreshing, hasMore, error, load, onRefresh, setQuery, setData, resetListState }
+  return { query, data, loading, refreshing, hasMore, error, loadMore, reload, onRefresh, setQuery, setData }
 }

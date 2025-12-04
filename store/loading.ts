@@ -12,5 +12,5 @@ export const useLoadingStore = create<LoadingState>(set => ({
   message: '加载中...',
   show: (message?: string) =>
     set(state => ({ visible: true, message: message ?? state.message })),
-  hide: () => set({ visible: false }),
+  hide: () => set({ visible: false, message: '加载中...' }),
 }))

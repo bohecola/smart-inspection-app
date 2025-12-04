@@ -35,7 +35,11 @@ export function FieldRenderer(props: Props) {
     case 'input-number':
       return (
         <MyInputNumber
-          placeholder={data.remark}
+          placeholder={
+            isEmpty(data.remark)
+              ? '请输入'
+              : data.remark
+          }
           value={value}
           onChangeText={onChange}
         />

@@ -1,12 +1,16 @@
 import type { GestureResponderEvent } from 'react-native'
+import { isNil } from 'lodash-es'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { Text } from '@/components/ui/text'
+import { cn } from '@/utils'
 
 export interface TabMenu<T = any> {
   title: string
   name: string
   data?: T
+  badge?: number | string
+  badgeClassName?: string
 }
 
 export interface TabMenuItemProps {
@@ -21,12 +25,20 @@ export function TabMenuItem({ data, isActive, onPress }: TabMenuItemProps) {
       className="flex-1 items-center justify-center relative"
       onPress={onPress}
     >
-      <Text className={isActive ? 'font-bold text-typography-900' : 'text-typography-500'}>
-        {data.title}
-      </Text>
+      <View className="flex-row items-center gap-1">
+        <Text className={isActive ? 'font-bold text-typography-900' : 'text-typography-500'}>
+          {data.title}
+        </Text>
+
+        {!isNil(data.badge) && (
+          <View className={cn('rounded-full w-4 h-4 items-center justify-center', data.badgeClassName)}>
+            <Text className="text-white text-xs">{data.badge}</Text>
+          </View>
+        )}
+      </View>
 
       {isActive && (
-        <View className="absolute bottom-0 w-2/5 h-1 rounded-full bg-primary-950" />
+        <View className={cn('absolute bottom-0 h-1 rounded-full bg-primary-950', isNil(data.badge) ? 'w-2/5' : 'w-1/2')} />
       )}
     </Pressable>
   )

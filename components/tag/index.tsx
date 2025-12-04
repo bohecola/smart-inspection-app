@@ -14,17 +14,20 @@ const GRADUAL_COLORS: Record<Variant, [ColorValue, ColorValue]> = {
 }
 
 type Props = PropsWithChildren<{
-  variant: Variant
+  variant?: Variant
   className?: string
+  colors?: [ColorValue, ColorValue]
+  start?: [number, number]
+  end?: [number, number]
 }>
 
-export function LinearGradientTag({ variant, children, className }: Props) {
+export function LinearGradientTag({ variant, children, className, colors, start = [0, 1], end = [1, 0] }: Props) {
   return (
     <LinearGradient
       className={`px-2 py-1 rounded-full ${className}`}
-      start={[0, 1]}
-      end={[1, 0]}
-      colors={GRADUAL_COLORS[variant]}
+      start={start}
+      end={end}
+      colors={colors || GRADUAL_COLORS[variant]}
     >
       {children}
     </LinearGradient>

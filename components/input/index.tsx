@@ -4,16 +4,17 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 export interface MyInputProps extends IInputFieldProps {
   isDisabled?: boolean
   variant?: 'underlined' | 'outline' | 'rounded'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   prefixIcon?: React.ElementType
   suffixIcon?: React.ElementType
   onSuffixIconPress?: () => void
 }
 
 export function MyInput(props: MyInputProps) {
-  const { prefixIcon, suffixIcon, isDisabled, variant = 'outline', onSuffixIconPress, ...rest } = props
+  const { className, prefixIcon, suffixIcon, isDisabled, variant = 'outline', size, onSuffixIconPress, ...rest } = props
 
   return (
-    <Input isDisabled={isDisabled} variant={variant}>
+    <Input className={className} isDisabled={isDisabled} variant={variant} size={size}>
       {prefixIcon && (
         <InputSlot className="pl-3">
           <InputIcon as={prefixIcon} />

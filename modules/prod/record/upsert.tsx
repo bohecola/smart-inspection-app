@@ -3,24 +3,23 @@ import type { RecordForm } from './helper'
 import type { ProductTaskRecordResultVO } from '@/api/ptms/task/productTask/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { isNil } from 'lodash-es'
 import { CalendarIcon, UserIcon } from 'lucide-react-native'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
-import { doExecute, getProductTaskRecordById, getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
+import { doProductTaskExecute, getProductTaskRecordById, getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
 import { MyButton } from '@/components/button'
 import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
-import { useDialog } from '@/components/dialog'
 import { FieldRenderer } from '@/components/field-renderer'
 import { FormItem } from '@/components/form'
 import { ImagePicker } from '@/components/image-picker'
 import { useAppToast } from '@/components/toast'
 import { ButtonText } from '@/components/ui/button'
 import { DATA_TYPE_MAP } from '@/enums'
-import { useLoading } from '@/hooks'
+import { useLoading, useNavigationBeforeRemoveGuard } from '@/hooks'
 import { useUserStore } from '@/store/user'
 import { recordSchema, useIsAddOrEditRoute } from './helper'
 
@@ -28,14 +27,11 @@ export default function RecordUpsert() {
   const router = useRouter()
   const toast = useAppToast()
   const currentDate = dayjs().format('YYYY-MM-DD')
-  const navigation = useNavigation()
-  const shouldBypassGuard = useRef(false)
 
   const { id, recordId } = useLocalSearchParams() as Record<string, string>
   const { info } = useUserStore()
   const { isAdd } = useIsAddOrEditRoute()
   const { showLoading, hideLoading } = useLoading()
-  const { showConfirmDialog } = useDialog()
 
   const [loading, setLoading] = useState(false)
 
@@ -78,6 +74,14 @@ export default function RecordUpsert() {
   // 列表
   const { fields, update } = useFieldArray({ control, name: 'recordResultList', keyName: '_key' })
 
+  // 监听返回
+  const { shouldBypassGuard } = useNavigationBeforeRemoveGuard({
+    shouldSkip: () => getValues('status') === '1',
+    onConfirm: handleSubmit((data) => {
+      return doExecuteRequest({ data, status: '0', loadingText: '保存中...' })
+    }),
+  })
+
   // 状态
   const status = watch('status')
   // 执行人
@@ -113,7 +117,7 @@ export default function RecordUpsert() {
   // 请求
   async function doExecuteRequest({ data, status, loadingText }: { data: RecordForm, status: string, loadingText: string }) {
     showLoading(loadingText)
-    const { msg } = await doExecute({ ...data, status })
+    const { msg } = await doProductTaskExecute({ ...data, status })
       .finally(hideLoading)
     toast.success(msg)
   }
@@ -131,31 +135,6 @@ export default function RecordUpsert() {
     await doExecuteRequest({ data, status: '1', loadingText: '提交中...' })
     router.back()
   }
-
-  // 监听返回
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', async (e) => {
-      // 跳过
-      if (shouldBypassGuard.current || getValues('status') === '1') {
-        shouldBypassGuard.current = false
-        return navigation.dispatch(e.data.action)
-      }
-      // 阻止默认行为
-      (e as any)?.preventDefault()
-      // 提示保存
-      try {
-        await showConfirmDialog({ description: '是否保存后再返回？' })
-          .then(async () => {
-            await handleSubmit(data => doExecuteRequest({ data, status: '0', loadingText: '保存中...' }))()
-          })
-          .catch(() => {})
-      }
-      finally {
-        navigation.dispatch(e.data.action)
-      }
-    })
-    return unsubscribe
-  }, [navigation])
 
   return (
     <View className="flex-1 bg-background-50 gap-2 pb-safe">

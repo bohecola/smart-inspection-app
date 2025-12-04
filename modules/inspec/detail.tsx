@@ -30,7 +30,7 @@ export default function InspecDetail() {
 
   const currentList = useMemo(() => {
     return detail?.taskContentList?.filter(item => item.status === currentTab.data) ?? []
-  }, [detail, currentTab])
+  }, [detail, currentTab.data])
 
   // 获取任务详情
   async function fetchData(id: string) {
@@ -65,6 +65,7 @@ export default function InspecDetail() {
   // 获取任务详情
   useFocusEffect(
     useCallback(() => {
+      setCurrentTab(tabs[0])
       fetchData(id)
     }, [id]),
   )

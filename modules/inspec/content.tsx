@@ -1,9 +1,9 @@
 import type { LinearGradientBoxVariant } from './components/LinearGradientBox'
 import type { PatorlTaskContentVO } from '@/api/ptms/task/patorlTask/types'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { isEmpty, toLower } from 'lodash-es'
 import { Search } from 'lucide-react-native'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { getContentByContentName } from '@/api/ptms/task/patorlTask'
 import { Empty } from '@/components/empty'
@@ -72,13 +72,15 @@ export default function InspecRecordContent() {
   }
 
   // 获取数据
-  useEffect(() => {
-    fetchData()
-  }, [contentName])
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, [contentName]),
+  )
 
   return (
     <View className="p-4 flex-1 bg-background-50 pb-safe">
-
+      {/* 图例 */}
       <Card className="gap-3">
         <View className="flex-row justify-around">
           {legends.map((legend, index) => (

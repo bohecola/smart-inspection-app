@@ -20,7 +20,7 @@ export function getPatorlTaskInfo(id: string): AxiosPromise<DataPatorlTaskInfoVO
 }
 
 // 处理执行
-export function doExecute(data: PatrolTaskRecordVO) {
+export function doPatorlTaskExecute(data: PatrolTaskRecordVO) {
   return request({
     url: '/ptms/pad/data/patorlTask/dealTask',
     method: 'post',

@@ -36,7 +36,7 @@ export function getProductTaskInfo(id: string): AxiosPromise<ProductTaskVO> {
 }
 
 // 处理执行
-export function doExecute(data: ProductTaskRecordVO) {
+export function doProductTaskExecute(data: ProductTaskRecordVO) {
   return request({
     url: '/ptms/pad/data/productTask/dealTask',
     method: 'post',

@@ -4,12 +4,13 @@ import type { PatrolTaskRecordResultVO } from '@/api/ptms/task/patorlTask/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { isNil } from 'lodash-es'
+import { groupBy, isNil } from 'lodash-es'
 import { CalendarIcon, MapPinned, UserIcon } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
-import { doExecute, getPatorlTaskRecordByContentId } from '@/api/ptms/task/patorlTask'
+import { doPatorlTaskExecute, getPatorlTaskRecordByContentId } from '@/api/ptms/task/patorlTask'
+import { MyAccordionItem } from '@/components/accordion'
 import { MyButton } from '@/components/button'
 import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
@@ -17,7 +18,9 @@ import { FieldRenderer } from '@/components/field-renderer'
 import { FormItem } from '@/components/form'
 import { ImagePicker } from '@/components/image-picker'
 import { useAppToast } from '@/components/toast'
+import { Accordion } from '@/components/ui/accordion'
 import { ButtonText } from '@/components/ui/button'
+import { Divider } from '@/components/ui/divider'
 import { DATA_TYPE_MAP } from '@/enums'
 import { useLoading, useNavigationBeforeRemoveGuard } from '@/hooks'
 import { useUserStore } from '@/store/user'
@@ -32,9 +35,8 @@ export default function InspecRecordUpsert() {
   const { showLoading, hideLoading } = useLoading()
 
   const [loading, setLoading] = useState(false)
-
+  // 打开表单时间
   const currentDate = dayjs().format('YYYY-MM-DD HH:mm:ss')
-
   // 表单
   const { control, watch, getValues, handleSubmit } = useForm<RecordForm>({
     // 初始化表单数据
@@ -72,6 +74,12 @@ export default function InspecRecordUpsert() {
   // 列表
   const { fields, update } = useFieldArray({ control, name: 'recordResultList', keyName: '_key' })
 
+  // 分组列表
+  const grouped = useMemo(() => {
+    const arr = fields.map((item, index) => ({ ...item, index }))
+    return groupBy(arr, 'objectName')
+  }, [fields])
+
   // 监听返回
   const { shouldBypassGuard } = useNavigationBeforeRemoveGuard({
     shouldSkip: () => getValues('status') === '1',
@@ -86,7 +94,6 @@ export default function InspecRecordUpsert() {
   const operator = watch('operator')
   // 执行日期
   const starttime = watch('starttime')
-
   // 禁用
   const isDisabled = useMemo(() => status === '1', [status])
   // 相机图标点击
@@ -115,7 +122,7 @@ export default function InspecRecordUpsert() {
   // 请求
   async function doExecuteRequest({ data, status, loadingText }: { data: RecordForm, status: string, loadingText: string }) {
     showLoading(loadingText)
-    const { msg } = await doExecute({ ...data, status })
+    const { msg } = await doPatorlTaskExecute({ ...data, status })
       .finally(hideLoading)
     toast.success(msg)
   }
@@ -150,64 +157,77 @@ export default function InspecRecordUpsert() {
 
                 {/* 任务项列表 */}
                 <View className="px-4 gap-3">
-                  {fields.map((item, index) => {
-                    return (
-                      <View
-                        key={item.itemId}
-                        className="p-4 bg-background-0 rounded-lg gap-2"
-                      >
-                        {/* 表单项 */}
-                        <Controller
-                          control={control}
-                          name={`recordResultList.${index}.result`}
-                          render={({ field: { value, onChange }, fieldState: { error } }) => (
-                            <FormItem
-                              label={`${index + 1}.【${item.projectName}】${item.description}`}
-                              isInvalid={!!error}
-                              errorText={error?.message}
-                              isDisabled={isDisabled}
-                              labelSuffix={(
-                                <CameraDeco
-                                  disabled={item.capture === 'Y'}
-                                  active={item.cameraActive}
-                                  onPress={() => onCameraPress(item, index)}
-                                />
-                              )}
-                              helperText={item.dataType === '2' ? '是否正常' : undefined}
-                            >
-                              <FieldRenderer
-                                type={DATA_TYPE_MAP[item.dataType]}
-                                value={value}
-                                data={item}
-                                onChange={onChange}
-                              />
-                            </FormItem>
-                          )}
-                        />
+                  <Accordion type="multiple" isCollapsible={true} defaultValue={Object.keys(grouped)}>
+                    {Object
+                      .entries(grouped)
+                      .map(([objectName, items], _i) => (
+                        <View key={objectName}>
+                          <MyAccordionItem value={objectName} title={objectName}>
+                            {items.map((item, _ii) => {
+                              return (
+                                <View
+                                  key={item.itemId}
+                                  className="bg-background-0 rounded-lg gap-2"
+                                >
+                                  {/* 表单项 */}
+                                  <Controller
+                                    control={control}
+                                    name={`recordResultList.${item.index}.result`}
+                                    render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                      <FormItem
+                                        label={`${_ii + 1}.【${item.projectName}】${item.description}`}
+                                        isInvalid={!!error}
+                                        errorText={error?.message}
+                                        isDisabled={isDisabled}
+                                        labelSuffix={(
+                                          <CameraDeco
+                                            disabled={item.capture === 'Y'}
+                                            active={item.cameraActive}
+                                            onPress={() => onCameraPress(item, item.index)}
+                                          />
+                                        )}
+                                        helperText={item.dataType === '2' ? '是否正常' : undefined}
+                                      >
+                                        <FieldRenderer
+                                          type={DATA_TYPE_MAP[item.dataType]}
+                                          value={value}
+                                          data={item}
+                                          onChange={onChange}
+                                        />
+                                      </FormItem>
+                                    )}
+                                  />
 
-                        {/* 相机拍摄 */}
-                        {item.cameraActive && (
-                          <Controller
-                            control={control}
-                            name={`recordResultList.${index}.files`}
-                            render={({ field: { value, onChange }, fieldState: { error } }) => (
-                              <FormItem
-                                isInvalid={!!error}
-                                errorText={error?.message}
-                                isDisabled={isDisabled}
-                              >
-                                <ImagePicker
-                                  value={value}
-                                  onChange={onChange}
-                                  autoUpload
-                                />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-                      </View>
-                    )
-                  })}
+                                  {/* 相机拍摄 */}
+                                  {item.cameraActive && (
+                                    <Controller
+                                      control={control}
+                                      name={`recordResultList.${item.index}.files`}
+                                      render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                        <FormItem
+                                          isInvalid={!!error}
+                                          errorText={error?.message}
+                                          isDisabled={isDisabled}
+                                        >
+                                          <ImagePicker
+                                            value={value}
+                                            onChange={onChange}
+                                            autoUpload
+                                          />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  )}
+
+                                  {_ii !== items.length - 1 && <Divider className="my-4" />}
+                                </View>
+                              )
+                            })}
+                          </MyAccordionItem>
+                          {_i !== Object.entries(grouped).length - 1 && <Divider />}
+                        </View>
+                      ))}
+                  </Accordion>
                 </View>
               </ScrollView>
 

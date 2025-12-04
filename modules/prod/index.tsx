@@ -1,3 +1,4 @@
+import type { TextInputSubmitEditingEvent } from 'react-native'
 import type { ProductTaskQuery, ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import type { TabMenu } from '@/components/tabs'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -11,7 +12,7 @@ import { TabsMenu } from '@/components/tabs'
 import { Divider } from '@/components/ui/divider'
 import { useList } from '@/hooks/list'
 import { useDict } from '@/utils'
-import { Item } from './components/item'
+import { Item } from './components/Item'
 
 export default function Prod() {
   const router = useRouter()
@@ -34,7 +35,7 @@ export default function Prod() {
 
   // 初始查询参数
   const initialQuery: ProductTaskQuery = {
-    pageSize: 10,
+    pageSize: 15,
     pageNum: 1,
     planType: '0',
     taskType: '0',
@@ -43,36 +44,38 @@ export default function Prod() {
   }
 
   // 列表
-  const { query, data, loading, refreshing, hasMore, error, load, onRefresh, setQuery, resetListState } = useList<ProductTaskVO, ProductTaskQuery>({
+  const { query, data, loading, refreshing, hasMore, error, loadMore, reload, onRefresh, setQuery } = useList<ProductTaskVO, ProductTaskQuery>({
     initialQuery,
     request: listProductTask,
   })
 
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {
-    // 重置列表状态
-    resetListState()
     // 设置当前标签
     setCurrentTab(item)
     // 设置查询参数
-    setQuery({ ...query, padStatus: item.data, pageNum: 1 })
+    setQuery({ ...query, padStatus: item.data })
   }
 
   // 搜索框编辑后点击完成
-  const onSubmitEditing = () => {
-    resetListState()
-    load()
+  const onSubmitEditing = (e: TextInputSubmitEditingEvent) => {
+    reload()
   }
 
-  // 监听输入变化
   const onChangeText = (text: string) => {
-    setQuery({ ...query, keyword: text, pageNum: 1 })
+    setQuery({ ...query, keyword: text })
+  }
+
+  const onLoad = () => loadMore()
+
+  const handleItemPress = (item: ProductTaskVO) => {
+    router.push(`/prod/${item.id}`)
   }
 
   // 监听状态变化
   useEffect(() => {
-    load()
-  }, [query.padStatus])
+    reload()
+  }, [query.keyword, query.padStatus])
 
   useEffect(() => {
     // 检查是否有刷新信号
@@ -95,8 +98,8 @@ export default function Prod() {
           variant="rounded"
           placeholder="请输入工作计划/工作任务/任务类别"
           value={query.keyword}
-          isDisabled={loading || refreshing}
           onChangeText={onChangeText}
+          isDisabled={loading || refreshing}
           onSubmitEditing={onSubmitEditing}
         />
       </View>
@@ -107,7 +110,7 @@ export default function Prod() {
 
       <FlatList
         ref={flatListRef}
-        onEndReached={load}
+        onEndReached={onLoad}
         onEndReachedThreshold={0.2}
         className="p-4"
         data={data}
@@ -117,6 +120,7 @@ export default function Prod() {
           <Item
             item={item}
             product_task_state={product_task_state}
+            onPress={handleItemPress}
           />
         )}
         refreshControl={(
@@ -130,7 +134,7 @@ export default function Prod() {
             loading={loading}
             error={error}
             hasMore={hasMore}
-            load={load}
+            load={onLoad}
           />
         )}
       />

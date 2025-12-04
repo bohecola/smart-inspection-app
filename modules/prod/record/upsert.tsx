@@ -189,14 +189,11 @@ export default function RecordUpsert() {
                               errorText={error?.message}
                               isDisabled={isDisabled}
                               labelSuffix={(
-                                <View className="flex-row items-center gap-2">
-                                  {/* 相机图标 */}
-                                  <CameraDeco
-                                    disabled={item.capture === 'Y'}
-                                    active={item.cameraActive}
-                                    onPress={() => onCameraPress(item, index)}
-                                  />
-                                </View>
+                                <CameraDeco
+                                  disabled={item.capture === 'Y'}
+                                  active={item.cameraActive}
+                                  onPress={() => onCameraPress(item, index)}
+                                />
                               )}
                               helperText={item.dataType === '2' ? '是否正常' : undefined}
                             >

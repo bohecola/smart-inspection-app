@@ -1,7 +1,9 @@
-import type { ImagePickerAsset } from 'expo-image-picker'
+import type { ImagePickerAsset, MediaType } from 'expo-image-picker'
 import type { UploaderFileListItem, UploaderRef } from '@/components/uploader/types'
 import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
+import dayjs from 'dayjs'
 import { launchCameraAsync } from 'expo-image-picker'
+import { isNil } from 'lodash-es'
 import { CameraIcon, ImageIcon, VideoIcon } from 'lucide-react-native'
 import { useRef, useState } from 'react'
 import { View } from 'react-native'
@@ -11,7 +13,9 @@ import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
 import { Uploader } from '@/components/uploader'
+import { alertToSettings, useLoading } from '@/hooks'
 import { cn } from '@/utils'
+import { getLocationAsync, requestLocationPermission } from '@/utils/locationService'
 import { queryCameraPermission, toUploadAsset } from './helper'
 
 export interface ImagePickerProps {
@@ -20,6 +24,7 @@ export interface ImagePickerProps {
   limit?: number
   autoUpload?: boolean
   isDisabled?: boolean
+  autoLocation?: boolean
   onTakeMediaSuccess?: (value: ImagePickerAsset[]) => void
   onChange?: (value: string | string[]) => void
 }
@@ -27,12 +32,15 @@ export interface ImagePickerProps {
 export function ImagePicker(props: ImagePickerProps) {
   const { isDisabled: isFormControlDisabled, isInvalid } = useFormControlContext()
 
+  const { showLoading, hideLoading } = useLoading()
+
   const {
     value,
     limit = 10,
     autoUpload = false,
     valueType = 'string',
     isDisabled = isFormControlDisabled,
+    autoLocation = false,
     onTakeMediaSuccess,
     onChange,
   } = props
@@ -60,7 +68,7 @@ export function ImagePicker(props: ImagePickerProps) {
   }
 
   // 拍摄照片
-  async function handleTakePhoto() {
+  async function handleTakeMedia(mediaType: MediaType) {
     // 查询相机权限
     const hasPermission = await queryCameraPermission()
 
@@ -71,9 +79,10 @@ export function ImagePicker(props: ImagePickerProps) {
 
     // 打开相机
     const { assets, canceled } = await launchCameraAsync({
-      mediaTypes: 'images',
+      mediaTypes: mediaType,
       aspect: [1, 1],
       quality: 1,
+      exif: true,
     })
 
     // 取消拍摄
@@ -85,6 +94,16 @@ export function ImagePicker(props: ImagePickerProps) {
     if (assets.length + uploadFileList.length > limit) {
       handleClose()
       return toast.warning(`最多拍摄上传 ${limit} 个文件`)
+    }
+
+    // 定位
+    if (autoLocation) {
+      // 请求定位权限
+      const hasLocationPermission = await requestLocationPermission()
+
+      if (!hasLocationPermission) {
+        return alertToSettings('位置')
+      }
     }
 
     // 拍摄成功回调
@@ -97,50 +116,35 @@ export function ImagePicker(props: ImagePickerProps) {
     if (autoUpload) {
       const [image] = assets
       const uploadAsset = toUploadAsset(image)
+
+      // 上传文件时传递定位数据
+      if (autoLocation) {
+        showLoading('获取定位中...')
+        const { coords } = await getLocationAsync()
+
+        if (isNil(coords)) {
+          hideLoading()
+          return toast.show('定位获取失败，请重新拍摄上传')
+        }
+
+        const fileDate = dayjs().format('YYYY-MM-DD HH:mm:ss')
+        const fileLng = coords.longitude
+        const fileLat = coords.latitude
+        const extra = { fileDate, fileLng, fileLat }
+        hideLoading()
+        return uploaderRef.current?.uploadFile([uploadAsset], extra)
+      }
+
+      // 上传文件
       uploaderRef.current?.uploadFile([uploadAsset])
     }
   }
+
+  // 拍摄照片
+  const handleTakePhoto = () => handleTakeMedia('images')
 
   // 拍摄视频
-  async function handleTakeVideo() {
-    // 查询相机权限
-    const hasPermission = await queryCameraPermission()
-
-    // 未授权
-    if (!hasPermission) {
-      return handleClose()
-    }
-
-    // 打开相机
-    const { assets, canceled } = await launchCameraAsync({
-      mediaTypes: 'videos',
-      quality: 1,
-    })
-
-    // 取消拍摄
-    if (canceled) {
-      return handleClose()
-    }
-
-    // 数量校验
-    if (assets.length + uploadFileList.length > limit) {
-      handleClose()
-      return toast.warning(`最多拍摄上传 ${limit} 个文件`)
-    }
-
-    // 拍摄成功回调
-    onTakeMediaSuccess?.(assets)
-
-    // 关闭弹窗
-    handleClose()
-
-    // 自动上传
-    if (autoUpload) {
-      const [video] = assets
-      const uploadAsset = toUploadAsset(video)
-      uploaderRef.current?.uploadFile([uploadAsset])
-    }
-  }
+  const handleTakeVideo = () => handleTakeMedia('videos')
 
   // 文件上传 Change 事件
   function onUploaderChange(value: string | string[]) {

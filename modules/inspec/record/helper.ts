@@ -19,6 +19,8 @@ export const recordSchema = z.object({
   status: z.string().nullish(),
   description: z.string().nullish(),
   remark: z.string().nullish(),
+  patrolType: z.string().nullish(),
+  location: z.any().nullable(),
   recordResultList: z.array(
     z.object({
       id: z.string().nullish(),

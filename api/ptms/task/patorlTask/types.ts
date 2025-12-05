@@ -211,6 +211,8 @@ export interface PatrolTaskRecordVO {
    * 相机是否活跃
    */
   cameraActive?: boolean
+
+  location?: string[] | string[][]
 }
 
 export interface PatrolTaskRecordResultVO {

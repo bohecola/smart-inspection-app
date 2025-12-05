@@ -12,6 +12,7 @@ import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
 import { Icon, MoonIcon, SunIcon } from '@/components/ui/icon'
 import { useAppStore } from '@/store/app'
 import { useUserStore } from '@/store/user'
+import { requestLocationPermission } from '@/utils/locationService'
 import '@/global.css'
 
 if (__DEV__) {
@@ -54,6 +55,8 @@ export default function RootLayout() {
   if (!mediaLibraryPermission.granted) {
     requestMediaLibraryPermission()
   }
+
+  requestLocationPermission()
 
   return (
     <GluestackUIProvider mode={colorMode}>

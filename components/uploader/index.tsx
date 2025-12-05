@@ -1,12 +1,12 @@
 import type { ViewerRef } from './components/viewer'
-import type { UploadAsset, UploaderFileListItem, UploaderProps, UploaderRef } from './types'
+import type { FileExtra, UploadAsset, UploaderFileListItem, UploaderProps, UploaderRef } from './types'
 import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import { getDocumentAsync } from 'expo-document-picker'
 import { getThumbnailAsync } from 'expo-video-thumbnails'
 import { isArray, isNil } from 'lodash-es'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { upload } from '@/api/comm'
+import { upload, uploadWithLocation } from '@/api/comm'
 import { delOss, listByIds } from '@/api/system/oss'
 import { getFilenameExt } from '@/utils'
 import { useAppToast } from '../toast'
@@ -94,7 +94,7 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
   }
 
   // 上传文件
-  async function handleUploadFile(assets: UploadAsset[]) {
+  async function handleUploadFile(assets: UploadAsset[], extra?: FileExtra) {
     // 转换文件列表
     const newFiles = assets.map(item => ({
       fileName: item.name,
@@ -129,9 +129,17 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
         type: item.mimeType,
       } as unknown as Blob)
 
+      if (extra) {
+        formData.append('fileDate', extra.fileDate)
+        formData.append('fileLng', String(extra.fileLng))
+        formData.append('fileLat', String(extra.fileLat))
+      }
+
       try {
         // 上传文件
-        const { data } = await upload(formData)
+        const { data } = extra
+          ? await uploadWithLocation(formData)
+          : await upload(formData)
 
         // 缩略图地址
         let thumbnailUrl: string
@@ -262,7 +270,7 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
 
   // 暴露方法
   useImperativeHandle(ref, () => ({
-    uploadFile: (assets: UploadAsset[]) => handleUploadFile(assets),
+    uploadFile: (assets: UploadAsset[], extra?: FileExtra) => handleUploadFile(assets, extra),
   }))
 
   return (

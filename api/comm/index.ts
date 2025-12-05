@@ -28,6 +28,15 @@ export function upload(data: FormData): AxiosPromise<UploadResult> {
   })
 }
 
+// 文件上传（带位置信息）
+export function uploadWithLocation(data: FormData): AxiosPromise<UploadResult> {
+  return request({
+    url: '/resource/oss/uploadLocation',
+    method: 'post',
+    data,
+  })
+}
+
 interface DingTalkSignParams {
   nonceStr?: string
   timeStamp?: string

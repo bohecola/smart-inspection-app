@@ -22,7 +22,7 @@ export interface UploaderFileListItem {
 }
 
 export interface UploaderRef {
-  uploadFile: (assets: UploadAsset[]) => Promise<void>
+  uploadFile: (assets: UploadAsset[], extra?: FileExtra) => Promise<void>
 }
 
 export interface UploaderProps {
@@ -50,6 +50,12 @@ export interface UploaderPreviewProps {
 export interface FilePreviewRendererProps {
   item: UploaderFileListItem
   type: FilePreviewType
+}
+
+export interface FileExtra {
+  fileDate?: string
+  fileLng?: number
+  fileLat?: number
 }
 
 export type FilePreviewType = 'image' | 'video' | 'word' | 'excel' | 'ppt' | 'pdf' | 'text' | 'compressed' | 'other'

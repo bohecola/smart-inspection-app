@@ -22,8 +22,9 @@ import { Accordion } from '@/components/ui/accordion'
 import { ButtonText } from '@/components/ui/button'
 import { Divider } from '@/components/ui/divider'
 import { DATA_TYPE_MAP } from '@/enums'
-import { useLoading, useNavigationBeforeRemoveGuard } from '@/hooks'
+import { useLoading, useNativeLocation, useNavigationBeforeRemoveGuard } from '@/hooks'
 import { useUserStore } from '@/store/user'
+import { getLocationAsync } from '@/utils/locationService'
 import { recordSchema, useIsAddOrEditRoute } from './helper'
 
 export default function InspecRecordUpsert() {
@@ -45,6 +46,7 @@ export default function InspecRecordUpsert() {
       try {
         // 拉取远程模版
         const { data } = await getPatorlTaskRecordByContentId(contentId)
+
         // 初始化相机是否可以拍摄状态
         data.recordResultList = data.recordResultList.map((item) => {
           const isCameraRequired = item.capture === 'Y'
@@ -54,10 +56,12 @@ export default function InspecRecordUpsert() {
             cameraActive: isCameraRequired || isFilesNotEmpty,
           }
         })
+
         // 新增时初始化执行人、执行日期
         if (isAdd) {
           Object.assign(data, { operator: info.nickName, starttime: currentDate })
         }
+
         return data
       }
       catch (error) {
@@ -73,6 +77,9 @@ export default function InspecRecordUpsert() {
 
   // 列表
   const { fields, update } = useFieldArray({ control, name: 'recordResultList', keyName: '_key' })
+
+  // 位置
+  const { latitudeRef, longitudeRef } = useNativeLocation()
 
   // 分组列表
   const grouped = useMemo(() => {
@@ -121,8 +128,27 @@ export default function InspecRecordUpsert() {
 
   // 请求
   async function doExecuteRequest({ data, status, loadingText }: { data: RecordForm, status: string, loadingText: string }) {
+    let location: string[] = [String(longitudeRef.current), String(latitudeRef.current)]
+
+    if (isNil(latitudeRef.current) || isNil(longitudeRef.current)) {
+      showLoading('正在重新获取定位...')
+      const { coords } = await getLocationAsync()
+
+      if (isNil(coords)) {
+        toast.show('定位获取失败，请重试')
+        return hideLoading()
+      }
+
+      location = [String(coords.longitude), String(coords.latitude)]
+      hideLoading()
+    }
+
     showLoading(loadingText)
-    const { msg } = await doPatorlTaskExecute({ ...data, status })
+    const { msg } = await doPatorlTaskExecute({
+      ...data,
+      status,
+      location,
+    })
       .finally(hideLoading)
     toast.success(msg)
   }
@@ -213,6 +239,7 @@ export default function InspecRecordUpsert() {
                                             value={value}
                                             onChange={onChange}
                                             autoUpload
+                                            autoLocation
                                           />
                                         </FormItem>
                                       )}

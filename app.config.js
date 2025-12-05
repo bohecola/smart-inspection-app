@@ -4,6 +4,7 @@ const cameraPermission = `允许${EXPO_PUBLIC_APP_NAME}访问相机以拍摄照�
 const microphonePermission = `允许${EXPO_PUBLIC_APP_NAME}访问麦克风以录制视频声音`
 const photosPermission = `允许${EXPO_PUBLIC_APP_NAME}访问相册以选择照片`
 const savePhotosPermission = `允许${EXPO_PUBLIC_APP_NAME}保存照片到相册`
+const locationPermission = `允许${EXPO_PUBLIC_APP_NAME}访问位置以获取位置信息`
 
 export default ({ config }) => ({
   ...config,
@@ -53,6 +54,12 @@ export default ({ config }) => ({
       {
         supportsBackgroundPlayback: true,
         supportsPictureInPicture: true,
+      },
+    ],
+    [
+      'expo-location',
+      {
+        locationAlwaysAndWhenInUsePermission: locationPermission,
       },
     ],
   ],

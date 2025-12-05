@@ -10,12 +10,19 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bohecola.smartinspectionapp"
+      "bundleIdentifier": "com.bohecola.smartinspectionapp",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "我们需要您的位置来获取拍照地点的经纬度信息。"
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bohecola.smartinspectionapp"
+      "package": "com.bohecola.smartinspectionapp",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",

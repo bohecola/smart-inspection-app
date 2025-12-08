@@ -15,7 +15,7 @@ interface SelectProps extends ISelectProps {
 }
 
 export function MySelect(props: SelectProps) {
-  const { options = [], placeholder, ...rest } = props
+  const { options = [], placeholder = '请选择', ...rest } = props
 
   return (
     <Select {...rest}>

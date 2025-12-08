@@ -27,3 +27,17 @@ export function useCaptcha() {
 
   return { captchaImage, captchaEnabled, uuid, getCaptcha }
 }
+
+export function useVisible() {
+  const [visible, setVisible] = useState(false)
+
+  const open = useCallback(() => {
+    setVisible(true)
+  }, [])
+
+  const close = useCallback(() => {
+    setVisible(false)
+  }, [])
+
+  return { visible, open, close }
+}

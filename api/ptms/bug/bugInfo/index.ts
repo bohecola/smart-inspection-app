@@ -1,18 +1,18 @@
 import type { AxiosPromise } from 'axios'
-import type { AddBugForm, BugQuery, FinishBugForm, FirstBugSaveForm, SecondBugSaveForm, UpdateBugForm } from './types'
+import type { BugForm, BugInfoVO, BugQuery, DataBugVO, FinishBugForm, FirstBugSaveForm, SecondBugSaveForm } from './types'
 import request from '@/service/request'
 
 // 查询缺陷记录列表
-export function listBug(data: BugQuery): AxiosPromise<any[]> {
+export function listBug(query: BugQuery): AxiosPromise<BugInfoVO[]> {
   return request({
     url: '/ptms/pad/data/bug/list',
     method: 'get',
-    params: data,
+    params: query,
   })
 }
 
 // 新增缺陷
-export function addBug(data: AddBugForm) {
+export function addBug(data: BugForm) {
   return request({
     url: '/ptms/pad/data/addBug',
     method: 'post',
@@ -20,8 +20,17 @@ export function addBug(data: AddBugForm) {
   })
 }
 
+// 修改缺陷记录
+export function updateBug(data: BugForm) {
+  return request({
+    url: '/ptms/pad/data/editBug',
+    method: 'put',
+    data,
+  })
+}
+
 // 获取缺陷记录详细信息
-export function getBugInfo(id: string): AxiosPromise<AddBugForm> {
+export function getBugInfo(id: string): AxiosPromise<DataBugVO> {
   return request({
     url: `/ptms/pad/data/getBugInfo/${id}`,
     method: 'get',
@@ -58,15 +67,6 @@ export function secondBugSave(data: SecondBugSaveForm) {
 export function finishBug(data: FinishBugForm) {
   return request({
     url: '/ptms/pad/data/finishBug',
-    method: 'put',
-    data,
-  })
-}
-
-// 修改缺陷记录
-export function updateBug(data: UpdateBugForm) {
-  return request({
-    url: '/ptms/pad/data/editBug',
     method: 'put',
     data,
   })

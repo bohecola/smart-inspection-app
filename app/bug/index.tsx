@@ -1,10 +1,7 @@
-import { View } from 'react-native'
-import { Text } from '@/components/ui/text'
+import Bug from '@/modules/bug'
 
-export default function Bug() {
+export default function BugPage() {
   return (
-    <View>
-      <Text>Bug</Text>
-    </View>
+    <Bug />
   )
 }

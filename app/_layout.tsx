@@ -87,7 +87,8 @@ export default function RootLayout() {
                 <Stack.Screen name="inspec/[id]/[contentName]/edit-record" options={{ title: '编辑巡检任务执行记录' }} />
                 <Stack.Screen name="inspec/[id]/[contentName]/view-record" options={{ title: '查看巡检任务执行记录' }} />
                 <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
-                <Stack.Screen name="bug/index" options={{ title: '缺陷' }} />
+                <Stack.Screen name="bug/index" options={{ title: '缺陷列表' }} />
+                <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
               </Stack.Protected>
               <Stack.Protected guard={isNil(token)}>
                 <Stack.Screen name="sign-in" options={{ title: '登录' }} />

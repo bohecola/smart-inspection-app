@@ -1,4 +1,3 @@
-import type { SubmitHandler } from 'react-hook-form'
 import type { RecordForm } from './helper'
 import type { ProductTaskRecordResultVO } from '@/api/ptms/task/productTask/types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -75,10 +74,10 @@ export default function RecordUpsert() {
   const { fields, update } = useFieldArray({ control, name: 'recordResultList', keyName: '_key' })
 
   // 监听返回
-  const { shouldBypassGuard } = useNavigationBeforeRemoveGuard({
+  const { shouldPass } = useNavigationBeforeRemoveGuard({
     shouldSkip: () => getValues('status') === '1',
     onConfirm: handleSubmit((data) => {
-      return doExecuteRequest({ data, status: '0', loadingText: '保存中...' })
+      return onSave(data)
     }),
   })
 
@@ -123,15 +122,15 @@ export default function RecordUpsert() {
   }
 
   // 保存
-  const onSave: SubmitHandler<RecordForm> = async (data) => {
-    shouldBypassGuard.current = true
+  async function onSave(data: RecordForm) {
+    shouldPass.current = true
     await doExecuteRequest({ data, status: '0', loadingText: '保存中...' })
     router.back()
   }
 
   // 提交
-  const onSubmit: SubmitHandler<RecordForm> = async (data) => {
-    shouldBypassGuard.current = true
+  async function onSubmit(data: RecordForm) {
+    shouldPass.current = true
     await doExecuteRequest({ data, status: '1', loadingText: '提交中...' })
     router.back()
   }

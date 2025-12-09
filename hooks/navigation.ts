@@ -12,13 +12,13 @@ export function useNavigationBeforeRemoveGuard(options?: BeforeRemoveGuardOption
   const { showConfirmDialog } = DialogManager
 
   const navigation = useNavigation()
-  const shouldBypassGuard = useRef(false)
+  const shouldPass = useRef(false)
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', async (e) => {
       // 跳过
-      if (shouldBypassGuard.current || shouldSkip?.()) {
-        shouldBypassGuard.current = false
+      if (shouldPass.current || shouldSkip?.()) {
+        shouldPass.current = false
         return navigation.dispatch(e.data.action)
       }
 
@@ -26,21 +26,26 @@ export function useNavigationBeforeRemoveGuard(options?: BeforeRemoveGuardOption
       (e as any)?.preventDefault()
 
       // 提示保存
-      try {
-        await showConfirmDialog({ description: '是否保存后再返回？' })
-          .then(async () => {
-            await onConfirm?.()
-          })
-          .catch(() => {})
-      }
-      finally {
-        navigation.dispatch(e.data.action)
-      }
+      await showConfirmDialog({ description: '是否保存后再返回？' })
+        .then(async () => {
+          // 确定回调
+          await onConfirm?.()
+
+          // 保存成功 => 继续返回
+          if (shouldPass.current) {
+            shouldPass.current = false
+            return navigation.dispatch(e.data.action)
+          }
+        })
+        .catch(() => {
+          // 取消 => 直接返回
+          return navigation.dispatch(e.data.action)
+        })
     })
     return unsubscribe
   }, [navigation])
 
   return {
-    shouldBypassGuard,
+    shouldPass,
   }
 }

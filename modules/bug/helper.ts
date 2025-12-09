@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import z from 'zod'
 import { getPowerList } from '@/api/ptms/base/powerstationInfo'
 import { getDevType } from '@/api/ptms/bug/bugDevCategory'
+import { getByPsIdAndType } from '@/api/ptms/scheme/patorlScheme'
+import { handleTree } from '@/utils'
 
 export const bugSchema = z.object({
   id: z.string().nullish(),
@@ -57,4 +59,23 @@ export function useBugCategoryList() {
   }
 
   return { bugCategoryList, bugCategoryOptions, fetchBugCategoryList }
+}
+
+// 设备列表
+export function useDevList() {
+  const [devList, setDevList] = useState([])
+  const [devTree, setDevTree] = useState([])
+
+  const fetchDevList = async (psId: string) => {
+    const { data } = await getByPsIdAndType(psId, '0')
+    setDevList(data)
+    const treeData = handleTree(data, 'id', 'pid')
+    setDevTree(treeData)
+  }
+
+  return {
+    devList,
+    devTree,
+    fetchDevList,
+  }
 }

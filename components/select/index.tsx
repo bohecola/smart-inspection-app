@@ -1,4 +1,5 @@
 import type { ISelectProps } from '@/components/ui/select'
+import { useMemo } from 'react'
 import { ChevronDownIcon } from '@/components/ui/icon'
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from '@/components/ui/select'
 
@@ -23,10 +24,14 @@ export function MySelect(props: SelectProps) {
     onChange?.(value)
   }
 
+  const label = useMemo(() => {
+    return options.find(option => option.value === rest.selectedValue)?.label
+  }, [options, rest.selectedValue])
+
   return (
     <Select {...rest} onValueChange={onValueChange}>
       <SelectTrigger>
-        <SelectInput placeholder={placeholder} />
+        <SelectInput value={label} placeholder={placeholder} />
         <SelectIcon className="ml-auto mr-3" as={ChevronDownIcon} />
       </SelectTrigger>
 

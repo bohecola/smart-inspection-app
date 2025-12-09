@@ -1,6 +1,6 @@
 import type { NodeRowProps, SelectionPropagation, TreeNode, TreeViewRef } from 'react-native-tree-multi-select'
 import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
-import { isArray, isEmpty } from 'lodash-es'
+import { isArray, isEmpty, isEqual } from 'lodash-es'
 import { useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { TreeView } from 'react-native-tree-multi-select'
@@ -24,6 +24,7 @@ interface TreeSelectProps {
   isDisabled?: boolean
   emptyText?: string
   onChange?: (value: string | string[]) => void
+  onItemsChange?: (items: TreeNode[]) => void
 }
 
 export function TreeSelect(props: TreeSelectProps) {
@@ -40,6 +41,7 @@ export function TreeSelect(props: TreeSelectProps) {
     isDisabled = isFormControlDisabled,
     emptyText,
     onChange,
+    onItemsChange,
   } = props
 
   // 弹窗状态
@@ -82,8 +84,17 @@ export function TreeSelect(props: TreeSelectProps) {
 
   // 确认
   const onConfirm = () => {
+    // 关闭
     close()
-    onChange?.(valueType === 'string' ? values.join(',') : values)
+    // 荷载
+    const payload = valueType === 'string' ? values.join(',') : values
+    // 如果值没有变化，则不进行回调
+    if (isEqual(payload, value)) {
+      return
+    }
+
+    onChange?.(payload)
+    onItemsChange?.(selectedNodes)
   }
 
   return (
@@ -109,7 +120,6 @@ export function TreeSelect(props: TreeSelectProps) {
         onConfirm={onConfirm}
       >
         <CheckboxGroup value={values}>
-
           {isEmpty(data)
             ? (
                 <Empty text={emptyText} />

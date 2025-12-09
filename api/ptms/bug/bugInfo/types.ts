@@ -354,9 +354,9 @@ export interface BugForm {
    */
   personliable?: string
   /**
-   * 电站id;电站id(powerstation_info表id)
+   * 电站id
    */
-  psId: string
+  psId?: string
   /**
    * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档
    */

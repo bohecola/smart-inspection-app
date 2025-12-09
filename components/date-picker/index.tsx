@@ -1,4 +1,5 @@
 import type { DateTimePickerEvent } from '@react-native-community/datetimepicker'
+import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import dayjs from 'dayjs'
 import { isEmpty } from 'lodash-es'
@@ -10,6 +11,7 @@ import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
 import { useVisible } from '@/hooks'
+import { cn } from '@/utils'
 
 interface MyDatePickerProps {
   mode?: 'datetime' | 'date' | 'time'
@@ -18,6 +20,7 @@ interface MyDatePickerProps {
   minDate?: Date
   maxDate?: Date
   placeholder?: string
+  isDisabled?: boolean
 }
 
 const DATE_FOMAT_MAP = {
@@ -26,14 +29,19 @@ const DATE_FOMAT_MAP = {
   time: 'HH:mm:ss',
 }
 
-export function MyDatePicker({
-  mode = 'date',
-  value,
-  minDate,
-  maxDate,
-  placeholder = '请选择',
-  onChange,
-}: MyDatePickerProps) {
+export function MyDatePicker(props: MyDatePickerProps) {
+  const { isDisabled: isFormControlDisabled, isInvalid } = useFormControlContext()
+
+  const {
+    mode = 'date',
+    value,
+    minDate,
+    maxDate,
+    placeholder = '请选择',
+    onChange,
+    isDisabled = isFormControlDisabled,
+  } = props
+
   const { visible, open, close } = useVisible()
 
   const [date, setDate] = useState(dayjs(isEmpty(value) ? undefined : value).toDate())
@@ -50,6 +58,10 @@ export function MyDatePicker({
 
   // 打开时间选择器
   function onInputPress() {
+    if (isDisabled) {
+      return
+    }
+
     Platform.OS === 'ios'
       ? setCurrentMode(mode)
       : setCurrentMode(mode === 'datetime' ? 'date' : mode)
@@ -104,7 +116,12 @@ export function MyDatePicker({
   return (
     <View>
       <Pressable onPress={onInputPress}>
-        <View className="py-2 px-3 flex-row justify-between items-center border border-outline-200 rounded">
+        <View className={cn(
+          'py-2 px-3 flex-row justify-between items-center border border-outline-200 rounded',
+          isDisabled ? 'bg-outline-50' : '',
+          isInvalid ? 'border-error-700' : '',
+        )}
+        >
           {isEmpty(value) && <Text className="text-typography-500">{placeholder}</Text>}
           {!isEmpty(value) && <Text className="text-typography-900">{dayjs(value).format('YYYY-MM-DD HH:mm:ss')}</Text>}
           <Icon className="ml-auto text-outline-500" size="md" as={ChevronDownIcon} />

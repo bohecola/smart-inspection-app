@@ -77,7 +77,7 @@ export interface BugInfoVO {
   /**
    * 影响发电功率(kW)
    */
-  noworkbattery: number
+  noworkbattery: string
 
   /**
    * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档
@@ -117,7 +117,7 @@ export interface DataBugVO {
   /**
    * 故障类别
    */
-  bugCategory?: number
+  bugCategory?: string
   /**
    * 故障类别名称
    */
@@ -137,16 +137,16 @@ export interface DataBugVO {
   /**
    * 电站项目部id
    */
-  deptId?: number
+  deptId?: string
   deptName?: string
   /**
    * 缺陷描述
    */
   description?: string
   /**
-   * 设备id;设备id(asset_device表id)
+   * 设备id
    */
-  devId?: number
+  devId?: string
   /**
    * 设备名称
    */
@@ -162,19 +162,19 @@ export interface DataBugVO {
   /**
    * 缺陷发现时间
    */
-  findtime?: Date
+  findtime?: string
   /**
    * 缺陷完成时间
    */
-  finishtime?: Date
+  finishtime?: string
   /**
    * 是否需要安全措施
    */
   hstep?: string
   /**
-   * ID缺陷编号;ID缺陷编号-带附件
+   * ID缺陷编号
    */
-  id?: number
+  id?: string
   /**
    * 缺陷级别;缺陷级别;0：一般缺陷；1：重大缺陷；2：紧急缺陷
    */
@@ -182,7 +182,7 @@ export interface DataBugVO {
   /**
    * 影响发电功率(kW)
    */
-  noworkbattery?: number
+  noworkbattery?: string
   /**
    * 审批意见
    */
@@ -198,7 +198,7 @@ export interface DataBugVO {
   /**
    * 电站id
    */
-  psId?: number
+  psId?: string
   /**
    * 电站名称
    */
@@ -225,7 +225,7 @@ export interface BugDealVO {
   /**
    * 缺陷id;缺陷id(bug_info表id)
    */
-  bugId?: number
+  bugId?: string
   /**
    * 安全措施
    */
@@ -237,7 +237,7 @@ export interface BugDealVO {
   /**
    * ID
    */
-  id?: number
+  id?: string
   /**
    * 操作时间
    */
@@ -262,14 +262,13 @@ export interface BugDealVO {
    * 类型名称
    */
   typeName?: string
-
 }
 
 export interface BugMaterialVO {
   /**
    * 缺陷id
    */
-  bugId?: number
+  bugId?: string
   /**
    * 数量
    */
@@ -281,7 +280,7 @@ export interface BugMaterialVO {
   /**
    * ID
    */
-  id?: number
+  id?: string
   /**
    * 物料规则型号
    */
@@ -376,7 +375,7 @@ export interface FinishBugForm {
   /**
    * 缺陷Id
    */
-  bugId?: number
+  bugId?: string
   /**
    * 消缺物料表List
    */
@@ -384,19 +383,19 @@ export interface FinishBugForm {
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * 缺陷恢复时间
    */
-  finishtime?: Date
+  finishtime?: string
   /**
    * 请求参数
    */
@@ -412,11 +411,11 @@ export interface FinishBugForm {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface FirstBugSaveForm {
@@ -432,7 +431,7 @@ export interface FirstBugSaveForm {
   /**
    * 缺陷Id
    */
-  bugId?: number
+  bugId?: string
   /**
    * 消缺物料表List
    */
@@ -440,19 +439,19 @@ export interface FirstBugSaveForm {
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * 缺陷恢复时间
    */
-  finishtime?: Date
+  finishtime?: string
   /**
    * 请求参数
    */
@@ -468,11 +467,11 @@ export interface FirstBugSaveForm {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface SecondBugSaveForm {
@@ -488,7 +487,7 @@ export interface SecondBugSaveForm {
   /**
    * 缺陷Id
    */
-  bugId?: number
+  bugId?: string
   /**
    * 消缺物料表List
    */
@@ -496,19 +495,19 @@ export interface SecondBugSaveForm {
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * 缺陷恢复时间
    */
-  finishtime?: Date
+  finishtime?: string
   /**
    * 请求参数
    */
@@ -524,18 +523,18 @@ export interface SecondBugSaveForm {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface BugMaterialBo {
   /**
    * 缺陷id
    */
-  bugId: number
+  bugId: string
   /**
    * 数量
    */
@@ -543,15 +542,15 @@ export interface BugMaterialBo {
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * 厂家
    */
@@ -559,7 +558,7 @@ export interface BugMaterialBo {
   /**
    * ID
    */
-  id?: number
+  id?: string
   /**
    * 物料规则型号
    */
@@ -583,11 +582,11 @@ export interface BugMaterialBo {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface ApproveRecordBo {
@@ -602,23 +601,23 @@ export interface ApproveRecordBo {
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * ID
    */
-  id?: number
+  id?: string
   /**
    * 审批对象id
    */
-  objectId: number
+  objectId: string
   /**
    * 审批对象名(数据库表名)
    */
@@ -642,11 +641,11 @@ export interface ApproveRecordBo {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface BugDealBo {
@@ -673,19 +672,19 @@ export interface BugDealBo {
   /**
    * 缺陷id;缺陷id(bug_info表id)
    */
-  bugId: number
+  bugId: string
   /**
    * 创建者
    */
-  createBy?: number
+  createBy?: string
   /**
    * 创建部门
    */
-  createDept?: number
+  createDept?: string
   /**
    * 创建时间
    */
-  createTime?: Date
+  createTime?: string
   /**
    * 安全措施
    */
@@ -697,7 +696,7 @@ export interface BugDealBo {
   /**
    * ID
    */
-  id?: number
+  id?: string
   /**
    * 操作时间
    */
@@ -717,7 +716,7 @@ export interface BugDealBo {
   /**
    * 电站名称
    */
-  psId?: number
+  psId?: string
   /**
    * 授权电站
    */
@@ -729,11 +728,11 @@ export interface BugDealBo {
   /**
    * 更新者
    */
-  updateBy?: number
+  updateBy?: string
   /**
    * 更新时间
    */
-  updateTime?: Date
+  updateTime?: string
 }
 
 export interface BugQuery extends Partial<PageQuery> {
@@ -761,7 +760,7 @@ export interface BugQuery extends Partial<PageQuery> {
   /**
    * 电站id
    */
-  psId?: number
+  psId?: string
   /**
    * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档
    */

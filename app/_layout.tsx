@@ -89,6 +89,7 @@ export default function RootLayout() {
                 <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
                 <Stack.Screen name="bug/index" options={{ title: '缺陷列表' }} />
                 <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
+                <Stack.Screen name="bug/[id]/handle" options={{ title: '缺陷处理' }} />
               </Stack.Protected>
               <Stack.Protected guard={isNil(token)}>
                 <Stack.Screen name="sign-in" options={{ title: '登录' }} />

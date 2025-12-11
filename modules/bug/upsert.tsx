@@ -110,6 +110,7 @@ export default function BugUpsert() {
     await fetchBugCategoryList(data.type)
   }
 
+  // 导航离开确认
   const { shouldPass } = useNavigationBeforeRemoveGuard({
     onConfirm: handleSubmit((data) => {
       return onSubmit(data)

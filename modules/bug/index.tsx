@@ -1,8 +1,8 @@
 import type { BugInfoVO, BugQuery } from '@/api/ptms/bug/bugInfo/types'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Stack, useRouter } from 'expo-router'
+import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listBug } from '@/api/ptms/bug/bugInfo'
 import { MyInput } from '@/components/input'
@@ -62,12 +62,17 @@ export default function Bug() {
   }
 
   function handleItemPress(item: BugInfoVO) {
-    console.log('item', item)
+    router.push(`/bug/${item.id}/handle`)
   }
 
   async function onLoad() {
     return fetchNextPage()
   }
+
+  // 刷新
+  useFocusEffect(useCallback(() => {
+    refetch()
+  }, []))
 
   return (
     <>

@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import { ChevronRightIcon, Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
+import { cn } from '@/utils'
 import { CellContext } from './context'
 
 export type CellProps = {
@@ -15,11 +16,14 @@ export type CellProps = {
   isLink?: boolean
   disabled?: boolean
   className?: string
+  titleClassName?: string
+  valueClassName?: string
+  valueTextClassName?: string
   onPress?: () => void
 } & PropsWithChildren
 
 export function Cell(props: CellProps) {
-  const { icon, rightIcon, title, label, value, children, isLink = false, disabled = false, onPress } = props
+  const { icon, rightIcon, title, label, value, children, isLink = false, disabled = false, className, titleClassName, valueClassName, valueTextClassName, onPress } = props
 
   const { isGroup } = useContext(CellContext)
 
@@ -32,21 +36,24 @@ export function Cell(props: CellProps) {
     >
       {(({ pressed }) => (
         <View
-          className={`
-            py-3 flex-row justify-between items-center gap-2 bg-background-0 
-            ${pressed && clickable ? 'bg-background-100' : ''}
-            ${isGroup ? 'px-0' : 'px-4 rounded-lg'}
-          `}
+          className={cn(
+            'w-full py-3 flex-row justify-between items-top gap-2 bg-background-0',
+            pressed && clickable ? 'bg-background-100' : '',
+            isGroup ? 'px-0' : 'px-4 rounded-lg',
+            className,
+          )}
         >
-          {icon && <Icon size="md" as={icon}></Icon>}
+          {icon && <Icon size="md" as={icon} className="mt-[2px]" />}
 
-          <View className="flex-1">
-            <Text>{title}</Text>
+          <View className="flex-row">
+            <Text className={cn(titleClassName)}>{title}</Text>
 
             {label && <Text>{label}</Text>}
           </View>
 
-          {value ? <Text>{value}</Text> : children}
+          <View className={cn('flex-1 items-end', valueClassName)}>
+            {value ? <Text className={cn('text-right', valueTextClassName)}>{value}</Text> : children}
+          </View>
 
           {rightIcon && <Icon size="md" as={rightIcon}></Icon>}
 

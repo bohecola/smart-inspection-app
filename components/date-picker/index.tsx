@@ -118,7 +118,7 @@ export function MyDatePicker(props: MyDatePickerProps) {
       <Pressable onPress={onInputPress}>
         <View className={cn(
           'py-2 px-3 flex-row justify-between items-center border border-outline-200 rounded',
-          isDisabled ? 'bg-outline-50' : '',
+          isDisabled ? 'opacity-40' : '',
           isInvalid ? 'border-error-700' : '',
         )}
         >

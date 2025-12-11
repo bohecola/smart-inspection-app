@@ -1,5 +1,5 @@
 import type { AxiosPromise } from 'axios'
-import type { BugForm, BugInfoVO, BugQuery, DataBugVO, FinishBugForm, FirstBugSaveForm, SecondBugSaveForm } from './types'
+import type { BugForm, BugInfoVO, BugQuery, DataBugVO, FirstBugSaveForm, SecondBugSaveForm } from './types'
 import request from '@/service/request'
 
 // 查询缺陷记录列表
@@ -64,10 +64,9 @@ export function secondBugSave(data: SecondBugSaveForm) {
 }
 
 // 消缺完成
-export function finishBug(data: FinishBugForm) {
+export function finishBug(id: string) {
   return request({
-    url: '/ptms/pad/data/finishBug',
+    url: `/ptms/pad/data/finishBug/${id}`,
     method: 'put',
-    data,
   })
 }

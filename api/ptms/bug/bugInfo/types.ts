@@ -272,7 +272,7 @@ export interface BugMaterialVO {
   /**
    * 数量
    */
-  count?: number
+  count?: string
   /**
    * 厂家
    */
@@ -420,58 +420,57 @@ export interface FinishBugForm {
 
 export interface FirstBugSaveForm {
   /**
-   * 故障分析
+   * 审核人
    */
-  analysis?: string
-  bugDealBo?: BugDealBo
+  approver?: string
   /**
-   * 缺陷处理dealList
+   * 审核时间
    */
-  bugDealSaveMap?: { [key: string]: BugDealBo }
+  approverDate?: string
   /**
-   * 缺陷Id
+   * 审核结果 0 待审核  1 审核通过  2 审核不通过
+   */
+  approveResult?: string
+  /**
+   * 缺陷id;缺陷id(bug_info表id)
    */
   bugId?: string
   /**
-   * 消缺物料表List
+   * 安全措施
    */
-  bugMaterialList?: BugMaterialBo[]
+  description?: string
   /**
-   * 创建者
+   * 附件
    */
-  createBy?: string
+  files?: string
   /**
-   * 创建部门
+   * ID
    */
-  createDept?: string
+  id?: string
   /**
-   * 创建时间
+   * 操作时间
    */
-  createTime?: string
+  operateDate?: string
   /**
-   * 缺陷恢复时间
+   * 操作人
    */
-  finishtime?: string
+  operator?: string
   /**
-   * 请求参数
+   * 审批意见
    */
-  params?: { [key: string]: { [key: string]: any } }
+  opinions?: string
   /**
-   * 处理过程
+   * 审核表数据  中的 审核结果
    */
-  process?: string
+  result?: string
   /**
-   * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档  常量
+   * 类型;0消缺前，1消缺中，2投运前
    */
-  status?: string
+  type?: string
   /**
-   * 更新者
+   * 类型名称
    */
-  updateBy?: string
-  /**
-   * 更新时间
-   */
-  updateTime?: string
+  typeName?: string
 }
 
 export interface SecondBugSaveForm {
@@ -479,55 +478,103 @@ export interface SecondBugSaveForm {
    * 故障分析
    */
   analysis?: string
-  bugDealBo?: BugDealBo
   /**
-   * 缺陷处理dealList
+   * 缺陷位置
    */
-  bugDealSaveMap?: { [key: string]: BugDealBo }
+  bugAddr?: string
   /**
-   * 缺陷Id
+   * 故障类别
    */
-  bugId?: string
+  bugCategory?: string
   /**
-   * 消缺物料表List
+   * 故障类别名称
    */
-  bugMaterialList?: BugMaterialBo[]
+  bugCategoryName?: string
   /**
-   * 创建者
+   * 消缺前、消缺中、投运前信息
    */
-  createBy?: string
+  bugDealList?: BugDealVO[]
   /**
-   * 创建部门
+   * 故障时长
    */
-  createDept?: string
+  bughour?: number
   /**
-   * 创建时间
+   * 消缺物料
    */
-  createTime?: string
+  bugMaterialList?: BugMaterialVO[]
   /**
-   * 缺陷恢复时间
+   * 电站项目部id
+   */
+  deptId?: string
+  deptName?: string
+  /**
+   * 缺陷描述
+   */
+  description?: string
+  /**
+   * 设备id;设备id(asset_device表id)
+   */
+  devId?: string
+  /**
+   * 设备名称
+   */
+  devName?: string
+  /**
+   * 设备类型
+   */
+  devType?: string
+  /**
+   * 缺陷发现人
+   */
+  finder?: string
+  /**
+   * 缺陷发现时间
+   */
+  findtime?: string
+  /**
+   * 缺陷完成时间
    */
   finishtime?: string
   /**
-   * 请求参数
+   * 是否需要安全措施
    */
-  params?: { [key: string]: { [key: string]: any } }
+  hstep?: string
   /**
-   * 处理过程
+   * ID缺陷编号;ID缺陷编号-带附件
+   */
+  id?: string
+  /**
+   * 缺陷级别;缺陷级别;0：一般缺陷；1：重大缺陷；2：紧急缺陷
+   */
+  level?: string
+  /**
+   * 影响发电功率(kW)
+   */
+  noworkbattery?: string
+  /**
+   * 审批意见
+   */
+  opinions?: string
+  /**
+   * 责任方;责任方;ops：运维方; owner：业主
+   */
+  personliable?: string
+  /**
+   * 处理过程及结果
    */
   process?: string
   /**
-   * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档  常量
+   * 电站id
+   */
+  psId?: string
+  /**
+   * 电站名称
+   */
+  psname?: string
+  /**
+   * 状态;0：待消缺 1：消缺中 2：挂起 3：已消缺 4：已归档
    */
   status?: string
-  /**
-   * 更新者
-   */
-  updateBy?: string
-  /**
-   * 更新时间
-   */
-  updateTime?: string
 }
 
 export interface BugMaterialBo {

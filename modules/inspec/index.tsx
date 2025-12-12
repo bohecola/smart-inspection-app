@@ -1,75 +1,72 @@
-import type { PatorlTaskQuery, PatorlTaskVO } from '@/api/ptms/task/patorlTask/types'
+import type { PatorlTaskVO } from '@/api/ptms/task/patorlTask/types'
 import type { TabMenu } from '@/components/tabs'
+import { useInfiniteScroll } from 'ahooks'
 import { useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listPatorlTask } from '@/api/ptms/task/patorlTask'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { TabsMenu } from '@/components/tabs'
-import { useList } from '@/hooks/list'
 import { useDict } from '@/utils'
 import { Item } from './components/Item'
 
+// 数据类型
+interface Data {
+  list: PatorlTaskVO[]
+  total: number
+}
+
+// Tab 列表
+const tabs: TabMenu<string>[] = [
+  { title: '可执行', name: 'can-execute', data: '0' },
+  { title: '待执行', name: 'pending-execute', data: '1' },
+  { title: '已完成', name: 'completed', data: '2' },
+]
+
 export default function Inspec() {
+  // 路由
   const router = useRouter()
-
-  // Tab 列表
-  const tabs: TabMenu<string>[] = [
-    { title: '可执行', name: 'can-execute', data: '0' },
-    { title: '待执行', name: 'pending-execute', data: '1' },
-    { title: '已完成', name: 'completed', data: '2' },
-  ]
-
-  // 当前 Tab
-  const [currentTab, setCurrentTab] = useState(tabs[0])
-
   // 字典数据
   const { product_task_state } = useDict('product_task_state')
-
-  // 初始查询参数
-  const initialQuery: PatorlTaskQuery = {
-    pageSize: 15,
-    pageNum: 1,
+  // 查询参数
+  const [query, setQuery] = useState({
     keyword: undefined,
-    padStatus: currentTab.data,
-  }
-
-  // 列表
-  const { query, data, loading, refreshing, hasMore, error, loadMore, reload, onRefresh, setQuery } = useList<PatorlTaskVO, PatorlTaskQuery>({
-    initialQuery,
-    request: listPatorlTask,
+    padStatus: tabs[0].data,
   })
-
+  // 每页条数
+  const PAGE_SIZE = 15
+  // 列表数据
+  const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+    const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
+    const { rows, total } = await listPatorlTask({ ...query, pageNum: page, pageSize: PAGE_SIZE })
+    return {
+      list: rows,
+      total,
+    }
+  }, {
+    manual: true,
+    reloadDeps: [query.padStatus],
+    isNoMore: d => d && d.list.length >= d.total,
+  })
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {
-    // 设置当前标签
-    setCurrentTab(item)
     // 设置查询参数
-    setQuery({ ...query, padStatus: item.data, pageNum: 1 })
+    setQuery({ ...query, padStatus: item.data })
   }
-
+  // 关键词 Change
   const onChangeText = (text: string) => {
     setQuery({ ...query, keyword: text })
   }
-
-  // 点击完成
+  // 关键词 Submit
   const onSubmitEditing = () => {
     reload()
   }
-
-  const onLoad = () => loadMore()
-
   // 点击任务项
   const handleItemPress = (item: PatorlTaskVO) => {
     router.push(`/inspec/${item.id}`)
   }
-
-  // 监听状态变化
-  useEffect(() => {
-    reload()
-  }, [query.keyword, query.padStatus])
 
   return (
     <View className="flex-1 bg-background-50 pb-safe">
@@ -81,7 +78,7 @@ export default function Inspec() {
           placeholder="请输入工作计划/工作任务"
           value={query.keyword}
           onChangeText={onChangeText}
-          isDisabled={loading || refreshing}
+          isDisabled={loading || loadingMore}
           onSubmitEditing={onSubmitEditing}
         />
       </View>
@@ -89,10 +86,10 @@ export default function Inspec() {
       <TabsMenu tabs={tabs} onTabChange={onTabChange} />
 
       <FlatList
-        onEndReached={onLoad}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.2}
         className="p-4"
-        data={data}
+        data={data?.list}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={Separator}
         renderItem={({ item }) => (
@@ -104,16 +101,16 @@ export default function Inspec() {
         )}
         refreshControl={(
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={loading}
+            onRefresh={reload}
           />
         )}
         ListFooterComponent={(
           <ListFooterComponent
-            loading={loading}
-            error={error}
-            hasMore={hasMore}
-            load={onLoad}
+            loading={loadingMore}
+            error={!!error}
+            hasMore={!noMore}
+            load={loadMore}
           />
         )}
       />

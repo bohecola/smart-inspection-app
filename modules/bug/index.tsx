@@ -1,8 +1,8 @@
 import type { BugInfoVO } from '@/api/ptms/bug/bugInfo/types'
 import { useInfiniteScroll } from 'ahooks'
-import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
-import { useCallback, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listBug } from '@/api/ptms/bug/bugInfo'
 import { MyInput } from '@/components/input'
@@ -23,12 +23,10 @@ export default function Bug() {
   const { bug_state } = useDict('bug_state')
   // 关键词
   const [keyword, setKeyword] = useState<string>(undefined)
-  // 错误
-  const [isError, setIsError] = useState<boolean>(false)
   // 每页条数
   const PAGE_SIZE = 15
   // 列表数据
-  const { data, loading, loadingMore, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+  const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
     const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
     const { rows, total } = await listBug({ keyword, pageNum: page, pageSize: PAGE_SIZE })
     return {
@@ -36,12 +34,9 @@ export default function Bug() {
       total,
     }
   }, {
+    manual: true,
     isNoMore: d => d && d.list.length >= d.total,
-    onSuccess: () => setIsError(false),
-    onError: () => setIsError(true),
   })
-  // 是否还有更多数据
-  const hasMore = data && data.list.length < data.total
   // 关键词 Change
   function onChangeText(text: string) {
     setKeyword(text)
@@ -59,11 +54,15 @@ export default function Bug() {
     router.push(`/bug/${item.id}/handle`)
   }
   // 刷新
-  useFocusEffect(useCallback(() => {
+  useEffect(() => {
+    // 检查是否有刷新信号
     if (refreshSignal === 'true') {
+      // 刷新
       reload()
+      // 清除参数
+      router.setParams({ refreshSignal: undefined })
     }
-  }, []))
+  }, [refreshSignal])
 
   return (
     <>
@@ -114,8 +113,8 @@ export default function Bug() {
           ListFooterComponent={(
             <ListFooterComponent
               loading={loadingMore}
-              error={isError}
-              hasMore={hasMore}
+              error={!!error}
+              hasMore={!noMore}
               load={loadMore}
             />
           )}

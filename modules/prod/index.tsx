@@ -1,6 +1,6 @@
-import type { TextInputSubmitEditingEvent } from 'react-native'
-import type { ProductTaskQuery, ProductTaskVO } from '@/api/ptms/task/productTask/types'
+import type { ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import type { TabMenu } from '@/components/tabs'
+import { useInfiniteScroll } from 'ahooks'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
 import { useEffect, useRef, useState } from 'react'
@@ -10,85 +10,89 @@ import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { TabsMenu } from '@/components/tabs'
 import { Divider } from '@/components/ui/divider'
-import { useList } from '@/hooks/list'
 import { useDict } from '@/utils'
 import { Item } from './components/Item'
 
+// 数据类型
+interface Data {
+  list: ProductTaskVO[]
+  total: number
+}
+
+// Tab 列表
+const tabs: TabMenu<string>[] = [
+  { title: '可执行', name: 'can-execute', data: '0' },
+  { title: '待执行', name: 'pending-execute', data: '1' },
+  { title: '已完成', name: 'completed', data: '2' },
+]
+
 export default function Prod() {
   const router = useRouter()
-  const params = useLocalSearchParams()
-  // Tab 列表
-  const tabs: TabMenu<string>[] = [
-    { title: '可执行', name: 'can-execute', data: '0' },
-    { title: '待执行', name: 'pending-execute', data: '1' },
-    { title: '已完成', name: 'completed', data: '2' },
-  ]
-
-  // 当前 Tab
-  const [currentTab, setCurrentTab] = useState(tabs[0])
-
+  // 路由参数
+  const { refreshSignal } = useLocalSearchParams() as Record<string, string>
   // FlatList 引用
   const flatListRef = useRef<FlatList<ProductTaskVO>>(null)
-
   // 字典数据
   const { product_task_state } = useDict('product_task_state')
-
-  // 初始查询参数
-  const initialQuery: ProductTaskQuery = {
-    pageSize: 15,
-    pageNum: 1,
+  // 查询参数
+  const [query, setQuery] = useState({
     planType: '0',
     taskType: '0',
     keyword: undefined,
-    padStatus: currentTab.data,
-  }
-
-  // 列表
-  const { query, data, loading, refreshing, hasMore, error, loadMore, reload, onRefresh, setQuery } = useList<ProductTaskVO, ProductTaskQuery>({
-    initialQuery,
-    request: listProductTask,
+    padStatus: tabs[0].data,
   })
-
+  // 每页条数
+  const PAGE_SIZE = 15
+  // 列表数据
+  const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+    const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
+    const { rows, total } = await listProductTask({ ...query, pageNum: page, pageSize: PAGE_SIZE })
+    return {
+      list: rows,
+      total,
+    }
+  }, {
+    manual: true,
+    reloadDeps: [query.padStatus],
+    isNoMore: d => d && d.list.length >= d.total,
+  })
+  // 回到顶部
+  const goToTop = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+  }
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {
-    // 设置当前标签
-    setCurrentTab(item)
     // 设置查询参数
     setQuery({ ...query, padStatus: item.data })
   }
-
-  // 搜索框编辑后点击完成
-  const onSubmitEditing = (e: TextInputSubmitEditingEvent) => {
-    reload()
-  }
-
+  // 关键词 Change
   const onChangeText = (text: string) => {
     setQuery({ ...query, keyword: text })
   }
-
-  const onLoad = () => loadMore()
-
+  // 关键词 Submit
+  const onSubmitEditing = () => {
+    reload()
+  }
+  // 点击任务项
   const handleItemPress = (item: ProductTaskVO) => {
     router.push(`/prod/${item.id}`)
   }
-
-  // 监听状态变化
-  useEffect(() => {
-    reload()
-  }, [query.keyword, query.padStatus])
-
+  // 刷新
   useEffect(() => {
     // 检查是否有刷新信号
-    if (params.refreshSignal === 'true') {
+    if (refreshSignal === 'true') {
       // 回到顶部
-      flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+      goToTop()
       // 刷新
-      onRefresh()
+      reload()
       // 清除参数
       router.setParams({ refreshSignal: undefined })
     }
-  }, [params.refreshSignal])
+  }, [refreshSignal])
 
+  useEffect(() => {
+    console.log(!!error)
+  }, [error])
   return (
     <View className="flex-1 bg-background-50 pb-safe">
       <View className="px-4 py-2 bg-background-0">
@@ -99,7 +103,7 @@ export default function Prod() {
           placeholder="请输入工作计划/工作任务/任务类别"
           value={query.keyword}
           onChangeText={onChangeText}
-          isDisabled={loading || refreshing}
+          isDisabled={loadingMore}
           onSubmitEditing={onSubmitEditing}
         />
       </View>
@@ -110,10 +114,10 @@ export default function Prod() {
 
       <FlatList
         ref={flatListRef}
-        onEndReached={onLoad}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.2}
         className="p-4"
-        data={data}
+        data={data?.list}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={Separator}
         renderItem={({ item }) => (
@@ -125,16 +129,16 @@ export default function Prod() {
         )}
         refreshControl={(
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={loading}
+            onRefresh={reload}
           />
         )}
         ListFooterComponent={(
           <ListFooterComponent
-            loading={loading}
-            error={error}
-            hasMore={hasMore}
-            load={onLoad}
+            loading={loadingMore}
+            error={!!error}
+            hasMore={!noMore}
+            load={loadMore}
           />
         )}
       />

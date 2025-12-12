@@ -4,7 +4,7 @@ import type { BugMaterialVO, DataBugVO } from '@/api/ptms/bug/bugInfo/types'
 import type { TabMenu } from '@/components/tabs'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { isEmpty, isNil } from 'lodash-es'
+import { isArray, isEmpty, isNil } from 'lodash-es'
 import { PlusIcon, Trash2 } from 'lucide-react-native'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -241,7 +241,17 @@ export default function BugHandle() {
         }
         if (!isNil(secondStep)) {
           const errors = Object.entries(secondStep).filter(Boolean)
-          const [error] = errors.map(([_, value]) => value) as FieldError[]
+          const [error] = errors.reduce((acc, [_, value]) => {
+            if (isArray(value)) {
+              const arr = []
+              for (const e of value) {
+                const i = Object.entries(e).map(([_, v]) => v)
+                arr.push(...i)
+              }
+              return [...acc, ...arr]
+            }
+            return [...acc, value]
+          }, []) as FieldError[]
 
           return toast.show(`第二步 / ${error?.message}`)
         }
@@ -566,9 +576,13 @@ export default function BugHandle() {
                             <View className="bg-background-0" key={item._key}>
                               <View className="py-2 px-3 flex-row justify-between items-center">
                                 <Text className="font-bold">物料信息</Text>
-                                <Pressable onPress={handleRemoveMaterial(index)}>
-                                  <Icon size="md" as={Trash2} />
-                                </Pressable>
+                                {!isDisabled
+                                  ? (
+                                      <Pressable onPress={handleRemoveMaterial(index)}>
+                                        <Icon size="md" as={Trash2} />
+                                      </Pressable>
+                                    )
+                                  : null}
                               </View>
 
                               <Divider />

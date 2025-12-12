@@ -1,8 +1,8 @@
-import type { BugInfoVO, BugQuery } from '@/api/ptms/bug/bugInfo/types'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import type { BugInfoVO } from '@/api/ptms/bug/bugInfo/types'
+import { useInfiniteScroll } from 'ahooks'
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listBug } from '@/api/ptms/bug/bugInfo'
 import { MyInput } from '@/components/input'
@@ -12,69 +12,56 @@ import { Pressable } from '@/components/ui/pressable'
 import { useDict } from '@/utils'
 import { Item } from './components/item'
 
+interface Data { list: BugInfoVO[], total: number }
+
 export default function Bug() {
   // 路由
   const router = useRouter()
   // 查询参数
-  const { refresh } = useLocalSearchParams() as Record<string, string>
+  const { refreshSignal } = useLocalSearchParams() as Record<string, string>
   // 字典数据
   const { bug_state } = useDict('bug_state')
-  // 查询参数
-  const [query, setQuery] = useState<BugQuery>({
-    pageSize: 15,
-    keyword: undefined,
+  // 关键词
+  const [keyword, setKeyword] = useState<string>(undefined)
+  // 错误
+  const [isError, setIsError] = useState<boolean>(false)
+  // 每页条数
+  const PAGE_SIZE = 15
+  // 列表数据
+  const { data, loading, loadingMore, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+    const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
+    const { rows, total } = await listBug({ keyword, pageNum: page, pageSize: PAGE_SIZE })
+    return {
+      list: rows,
+      total,
+    }
+  }, {
+    isNoMore: d => d && d.list.length >= d.total,
+    onSuccess: () => setIsError(false),
+    onError: () => setIsError(true),
   })
-  // 列表查询
-  const { data, isLoading, isRefetching, isError, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-    queryKey: ['bug'],
-    queryFn: async ({ pageParam = 1 }) => {
-      const { rows, total } = await listBug({ ...query, pageNum: pageParam })
-      return { rows, total, currentPage: pageParam }
-    },
-    getNextPageParam: (lastPage) => {
-      const { total, currentPage } = lastPage
-      // 总页数
-      const totalPages = Math.ceil(total / query.pageSize)
-      // 下一页
-      const nextPage = currentPage + 1
-      // 如果下一页小于等于总页数，则返回下一页
-      if (nextPage <= totalPages) {
-        return nextPage
-      }
-      // 否则返回有更多页了
-      return undefined
-    },
-    initialPageParam: 1,
-  })
-
-  const list = useMemo(() => {
-    return data?.pages.flatMap(page => page.rows) ?? []
-  }, [data])
-
+  // 是否还有更多数据
+  const hasMore = data && data.list.length < data.total
+  // 关键词 Change
+  function onChangeText(text: string) {
+    setKeyword(text)
+  }
+  // 关键词 Submit
+  function onSubmitEditing() {
+    reload()
+  }
+  // 新增
   function handleHeaderRightPress() {
     router.push('/bug/add')
   }
-
-  function onChangeText(text: string) {
-    setQuery({ ...query, keyword: text })
-  }
-
-  function onSubmitEditing() {
-    refetch()
-  }
-
+  // 点击缺陷项
   function handleItemPress(item: BugInfoVO) {
     router.push(`/bug/${item.id}/handle`)
   }
-
-  async function onLoad() {
-    return fetchNextPage()
-  }
-
   // 刷新
   useFocusEffect(useCallback(() => {
-    if (refresh === 'true') {
-      refetch()
+    if (refreshSignal === 'true') {
+      reload()
     }
   }, []))
 
@@ -97,18 +84,18 @@ export default function Bug() {
             returnKeyType="done"
             variant="rounded"
             placeholder="请输入"
-            value={query.keyword}
+            value={keyword}
             onChangeText={onChangeText}
-            isDisabled={isLoading}
+            isDisabled={loading || loadingMore}
             onSubmitEditing={onSubmitEditing}
           />
         </View>
 
         <FlatList
-          onEndReached={onLoad}
+          onEndReached={loadMore}
           onEndReachedThreshold={0.2}
           className="p-4"
-          data={list}
+          data={data?.list}
           keyExtractor={item => item.id}
           ItemSeparatorComponent={Separator}
           renderItem={({ item }) => (
@@ -120,16 +107,16 @@ export default function Bug() {
           )}
           refreshControl={(
             <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={refetch}
+              refreshing={loading}
+              onRefresh={reload}
             />
           )}
           ListFooterComponent={(
             <ListFooterComponent
-              loading={isLoading}
+              loading={loadingMore}
               error={isError}
-              hasMore={hasNextPage}
-              load={onLoad}
+              hasMore={hasMore}
+              load={loadMore}
             />
           )}
         />

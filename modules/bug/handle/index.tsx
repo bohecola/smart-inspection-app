@@ -271,7 +271,7 @@ export default function BugHandle() {
       toast.success(msg)
       router.dismissTo({
         pathname: '/bug',
-        params: { refresh: 'true' },
+        params: { refreshSignal: 'true' },
       })
     }
     catch (error) {

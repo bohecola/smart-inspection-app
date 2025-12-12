@@ -130,7 +130,7 @@ export default function BugUpsert() {
     toast.success(msg)
     router.dismissTo({
       pathname: '/bug',
-      params: { refresh: 'true' },
+      params: { refreshSignal: 'true' },
     })
   }
 

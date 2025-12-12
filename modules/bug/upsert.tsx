@@ -128,7 +128,10 @@ export default function BugUpsert() {
     showLoading('提交中...')
     const { msg } = await addBug(data).finally(hideLoading)
     toast.success(msg)
-    router.back()
+    router.dismissTo({
+      pathname: '/bug',
+      params: { refresh: 'true' },
+    })
   }
 
   return (

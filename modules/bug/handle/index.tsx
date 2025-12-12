@@ -269,7 +269,10 @@ export default function BugHandle() {
       showLoading('完成中...')
       const { msg } = await finishBug(id)
       toast.success(msg)
-      router.dismissTo('/bug')
+      router.dismissTo({
+        pathname: '/bug',
+        params: { refresh: 'true' },
+      })
     }
     catch (error) {
       console.log(error)

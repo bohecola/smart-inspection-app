@@ -1,6 +1,6 @@
 import type { BugInfoVO, BugQuery } from '@/api/ptms/bug/bugInfo/types'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Stack, useFocusEffect, useRouter } from 'expo-router'
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
 import { useCallback, useMemo, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
@@ -15,6 +15,8 @@ import { Item } from './components/item'
 export default function Bug() {
   // 路由
   const router = useRouter()
+  // 查询参数
+  const { refresh } = useLocalSearchParams() as Record<string, string>
   // 字典数据
   const { bug_state } = useDict('bug_state')
   // 查询参数
@@ -71,7 +73,9 @@ export default function Bug() {
 
   // 刷新
   useFocusEffect(useCallback(() => {
-    refetch()
+    if (refresh === 'true') {
+      refetch()
+    }
   }, []))
 
   return (

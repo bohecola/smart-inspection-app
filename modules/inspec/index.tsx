@@ -3,7 +3,7 @@ import type { TabMenu } from '@/components/tabs'
 import { useInfiniteScroll } from 'ahooks'
 import { useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listPatorlTask } from '@/api/ptms/task/patorlTask'
 import { MyInput } from '@/components/input'
@@ -37,10 +37,13 @@ export default function Inspec() {
   })
   // 每页条数
   const PAGE_SIZE = 15
+  // 取消请求
+  const abortController = useRef<AbortController>(null)
   // 列表数据
   const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+    abortController.current = new AbortController()
     const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
-    const { rows, total } = await listPatorlTask({ ...query, pageNum: page, pageSize: PAGE_SIZE })
+    const { rows, total } = await listPatorlTask({ ...query, pageNum: page, pageSize: PAGE_SIZE }, { signal: abortController.current.signal })
     return {
       list: rows,
       total,
@@ -49,6 +52,10 @@ export default function Inspec() {
     manual: true,
     reloadDeps: [query.padStatus],
     isNoMore: d => d && d.list.length >= d.total,
+    onBefore: () => {
+      abortController.current?.abort()
+      abortController.current = new AbortController()
+    },
   })
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {

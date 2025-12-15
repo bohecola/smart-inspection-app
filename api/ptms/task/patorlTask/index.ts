@@ -1,13 +1,14 @@
-import type { AxiosPromise } from 'axios'
+import type { AxiosPromise, AxiosRequestConfig } from 'axios'
 import type { DataPatorlTaskInfoVO, GetContentByContentNameParams, PatorlTaskContentVO, PatorlTaskQuery, PatorlTaskVO, PatrolTaskRecordVO } from './types'
 import request from '@/service/request'
 
 // 查询列表
-export function listPatorlTask(query: PatorlTaskQuery): AxiosPromise<PatorlTaskVO[]> {
+export function listPatorlTask(query: PatorlTaskQuery, config?: AxiosRequestConfig): AxiosPromise<PatorlTaskVO[]> {
   return request({
     url: '/ptms/pad/data/patorlTask/list',
     method: 'get',
     params: query,
+    ...config,
   })
 }
 

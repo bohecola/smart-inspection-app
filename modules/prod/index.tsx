@@ -43,10 +43,13 @@ export default function Prod() {
   })
   // 每页条数
   const PAGE_SIZE = 15
+  // 取消请求
+  const abortController = useRef<AbortController>(null)
   // 列表数据
   const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
+    abortController.current = new AbortController()
     const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
-    const { rows, total } = await listProductTask({ ...query, pageNum: page, pageSize: PAGE_SIZE })
+    const { rows, total } = await listProductTask({ ...query, pageNum: page, pageSize: PAGE_SIZE }, { signal: abortController.current.signal })
     return {
       list: rows,
       total,
@@ -55,6 +58,10 @@ export default function Prod() {
     manual: true,
     reloadDeps: [query.padStatus],
     isNoMore: d => d && d.list.length >= d.total,
+    onBefore: () => {
+      abortController.current?.abort()
+      abortController.current = new AbortController()
+    },
   })
   // 回到顶部
   const goToTop = () => {

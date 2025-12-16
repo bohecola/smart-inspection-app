@@ -7,14 +7,7 @@ import { getToastInstance } from '@/components/toast'
 export async function requestLocationPermission() {
   if (Platform.OS === 'android') {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: '位置权限',
-          message: '应用需要访问您的位置信息',
-          buttonPositive: '确定',
-        },
-      )
+      const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
       return granted === PermissionsAndroid.RESULTS.GRANTED
     }
     catch (err) {

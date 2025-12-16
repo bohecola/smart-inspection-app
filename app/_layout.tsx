@@ -2,7 +2,7 @@ import { useCameraPermissions, useMediaLibraryPermissions } from 'expo-image-pic
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isNil } from 'lodash-es'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DialogProvider } from '@/components/dialog'
 import { GlobalLoading } from '@/components/loading'
 import { useAppToast } from '@/components/toast'
@@ -26,26 +26,22 @@ export default function RootLayout() {
 
   const { colorMode, color, backgroundColor, setColorMode } = useAppStore()
 
-  const [cameraPermission, requestCameraPermission] = useCameraPermissions()
-  const [mediaLibraryPermission, requestMediaLibraryPermission] = useMediaLibraryPermissions()
-
-  if (!cameraPermission) {
-    return null
+  const [, requestCameraPermission] = useCameraPermissions()
+  const [, requestMediaLibraryPermission] = useMediaLibraryPermissions()
+  // 请求权限
+  const requestPermission = async () => {
+    await new Promise(r => setTimeout(r, 300))
+    // 请求相机权限
+    await requestCameraPermission()
+    // 请求媒体库权限
+    await requestMediaLibraryPermission()
+    // 请求位置权限
+    await requestLocationPermission()
   }
 
-  if (!mediaLibraryPermission) {
-    return null
-  }
-
-  if (!cameraPermission.granted) {
-    requestCameraPermission()
-  }
-
-  if (!mediaLibraryPermission.granted) {
-    requestMediaLibraryPermission()
-  }
-
-  requestLocationPermission()
+  useEffect(() => {
+    requestPermission()
+  }, [])
 
   return (
     <GluestackUIProvider mode={colorMode}>

@@ -1,15 +1,15 @@
 import type { BugInfoVO } from '@/api/ptms/bug/bugInfo/types'
 import { useInfiniteScroll } from 'ahooks'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { Stack, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listBug } from '@/api/ptms/bug/bugInfo'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
-import { useDict } from '@/utils'
+import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/item'
 
 interface Data { list: BugInfoVO[], total: number }
@@ -17,8 +17,6 @@ interface Data { list: BugInfoVO[], total: number }
 export default function Bug() {
   // 路由
   const router = useRouter()
-  // 查询参数
-  const { refreshSignal } = useLocalSearchParams() as Record<string, string>
   // 字典数据
   const { bug_state } = useDict('bug_state')
   // 关键词
@@ -53,16 +51,10 @@ export default function Bug() {
   function handleItemPress(item: BugInfoVO) {
     router.push(`/bug/${item.id}/handle`)
   }
-  // 刷新
-  useEffect(() => {
-    // 检查是否有刷新信号
-    if (refreshSignal === 'true') {
-      // 刷新
-      reload()
-      // 清除参数
-      router.setParams({ refreshSignal: undefined })
-    }
-  }, [refreshSignal])
+  // 列表刷新
+  useEventBus('bug:list:refresh', () => {
+    reload()
+  })
 
   return (
     <>

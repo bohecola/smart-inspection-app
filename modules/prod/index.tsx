@@ -1,16 +1,16 @@
 import type { ProductTaskVO } from '@/api/ptms/task/productTask/types'
 import type { TabMenu } from '@/components/tabs'
 import { useInfiniteScroll } from 'ahooks'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { listProductTask } from '@/api/ptms/task/productTask'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { TabsMenu } from '@/components/tabs'
 import { Divider } from '@/components/ui/divider'
-import { useDict } from '@/utils'
+import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/Item'
 
 // 数据类型
@@ -28,8 +28,6 @@ const tabs: TabMenu<string>[] = [
 
 export default function Prod() {
   const router = useRouter()
-  // 路由参数
-  const { refreshSignal } = useLocalSearchParams() as Record<string, string>
   // FlatList 引用
   const flatListRef = useRef<FlatList<ProductTaskVO>>(null)
   // 字典数据
@@ -84,22 +82,15 @@ export default function Prod() {
   const handleItemPress = (item: ProductTaskVO) => {
     router.push(`/prod/${item.id}`)
   }
-  // 刷新
-  useEffect(() => {
-    // 检查是否有刷新信号
-    if (refreshSignal === 'true') {
-      // 回到顶部
-      goToTop()
-      // 刷新
-      reload()
-      // 清除参数
-      router.setParams({ refreshSignal: undefined })
-    }
-  }, [refreshSignal])
 
-  useEffect(() => {
-    console.log(!!error)
-  }, [error])
+  // 列表刷新
+  useEventBus('prod:list:refresh', () => {
+    // 回到顶部
+    goToTop()
+    // 刷新
+    reload()
+  })
+
   return (
     <View className="flex-1 bg-background-50 pb-safe">
       <View className="px-4 py-2 bg-background-0">

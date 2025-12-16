@@ -1,9 +1,10 @@
 import type { LinearGradientBoxVariant } from './components/LinearGradientBox'
 import type { PatorlTaskContentVO } from '@/api/ptms/task/patorlTask/types'
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { useRequest } from 'ahooks'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { isEmpty, toLower } from 'lodash-es'
 import { Search } from 'lucide-react-native'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { getContentByContentName } from '@/api/ptms/task/patorlTask'
 import { Empty } from '@/components/empty'
@@ -11,6 +12,7 @@ import { MyInput } from '@/components/input'
 import { Card } from '@/components/ui/card'
 import { Grid, GridItem } from '@/components/ui/grid'
 import { Text } from '@/components/ui/text'
+import { eventBus, useEventBus } from '@/utils'
 import { LinearGradientBox } from './components/LinearGradientBox'
 
 export default function InspecRecordContent() {
@@ -23,21 +25,19 @@ export default function InspecRecordContent() {
   ]
 
   const [keyword, setKeyword] = useState('')
-  const [loading, setLoading] = useState(false)
   const [list, setList] = useState<PatorlTaskContentVO[]>([])
   const [searchList, setSearchList] = useState<PatorlTaskContentVO[]>([])
 
   // 获取数据
-  async function fetchData() {
-    setLoading(true)
-    const { data } = await getContentByContentName({
-      taskId: id,
-      contentName,
-    })
-    setList(data)
-    setSearchList(data)
-    setLoading(false)
-  }
+  const { loading, refresh } = useRequest(() => getContentByContentName({
+    taskId: id,
+    contentName,
+  }), {
+    onSuccess: ({ data }) => {
+      setList(data)
+      setSearchList(data)
+    },
+  })
 
   // 搜索结果
   const searchResult = useMemo(() => {
@@ -71,12 +71,12 @@ export default function InspecRecordContent() {
     }
   }
 
-  // 获取数据
-  useFocusEffect(
-    useCallback(() => {
-      fetchData()
-    }, [contentName]),
-  )
+  // 内容刷新
+  useEventBus('inspec:content:refresh', () => {
+    refresh()
+    // 通知详情刷新
+    eventBus.emit('inspec:detail:refresh')
+  })
 
   return (
     <View className="p-4 flex-1 bg-background-50 pb-safe">

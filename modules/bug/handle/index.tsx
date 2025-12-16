@@ -29,7 +29,7 @@ import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
 import { Textarea, TextareaInput } from '@/components/ui/textarea'
 import { useLoading } from '@/hooks'
-import { cn, selectDictLabel, useDict } from '@/utils'
+import { cn, eventBus, selectDictLabel, useDict } from '@/utils'
 import { handleSchema } from './helper'
 
 // 大步骤
@@ -269,10 +269,10 @@ export default function BugHandle() {
       showLoading('完成中...')
       const { msg } = await finishBug(id)
       toast.success(msg)
-      router.dismissTo({
-        pathname: '/bug',
-        params: { refreshSignal: 'true' },
-      })
+      // 通知列表刷新
+      eventBus.emit('bug:list:refresh')
+      // 返回列表
+      router.back()
     }
     catch (error) {
       console.log(error)

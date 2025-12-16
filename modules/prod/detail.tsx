@@ -1,24 +1,24 @@
 import type { ProductTaskRecordVO, ProductTaskVO } from '@/api/ptms/task/productTask/types'
+import { useRequest } from 'ahooks'
 import dayjs from 'dayjs'
-import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { isNil } from 'lodash-es'
 import { ListCheck, PlusIcon } from 'lucide-react-native'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
 import { dealDoneTask, getProductTaskInfo } from '@/api/ptms/task/productTask'
-import { MyButton } from '@/components/button'
 import { useDialog } from '@/components/dialog'
 import { Empty } from '@/components/empty'
 import { Separator } from '@/components/list'
 import { LinearGradientTag } from '@/components/tag'
 import { useAppToast } from '@/components/toast'
-import { ButtonText } from '@/components/ui/button'
+import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
 import { useLoading } from '@/hooks'
-import { selectDictLabel, useDict } from '@/utils'
+import { eventBus, selectDictLabel, useDict, useEventBus } from '@/utils'
 
 export default function ProdDetail() {
   const router = useRouter()
@@ -26,20 +26,15 @@ export default function ProdDetail() {
   const { id } = useLocalSearchParams() as Record<string, string>
   const { showLoading, hideLoading } = useLoading()
   const { showConfirmDialog } = useDialog()
-
   const { product_task_cycel } = useDict('product_task_cycel')
-
   const [detail, setDetail] = useState<ProductTaskVO>(null)
-  const [loading, setLoading] = useState(false)
 
-  // 获取任务详情
-  async function fetchData(id: string) {
-    setLoading(true)
-    const { data } = await getProductTaskInfo(id)
-
-    setDetail(data)
-    setLoading(false)
-  }
+  // 获取数据
+  const { loading, refresh } = useRequest(() => getProductTaskInfo(id), {
+    onSuccess: ({ data }) => {
+      setDetail(data)
+    },
+  })
 
   // 新增
   function handleHeaderRightPress() {
@@ -103,21 +98,21 @@ export default function ProdDetail() {
         showLoading('正在提交数据...')
         const { msg } = await dealDoneTask(detail.id)
         toast.success(msg)
-        router.dismissTo({
-          pathname: '/prod',
-          params: { refreshSignal: 'true' },
-        })
+        // 通知列表刷新
+        eventBus.emit('prod:list:refresh')
+        // 返回列表页
+        router.back()
       })
       .catch(() => {})
       .finally(hideLoading)
   }
 
-  // 获取任务详情
-  useFocusEffect(
-    useCallback(() => {
-      fetchData(id)
-    }, [id]),
-  )
+  // 详情刷新
+  useEventBus('prod:detail:refresh', () => {
+    refresh()
+    // 通知列表刷新
+    eventBus.emit('prod:list:refresh')
+  })
 
   return (
     <>
@@ -165,14 +160,14 @@ export default function ProdDetail() {
 
                   {detail?.cycel === '1' && detail?.status === '2' && (
                     <View className="flex-row justify-end">
-                      <MyButton
-                        prefixIcon={ListCheck}
+                      <Button
                         action="positive"
                         className="rounded-full"
                         onPress={handleCompletePress}
                       >
+                        <ButtonIcon className="text-white" as={ListCheck} />
                         <ButtonText className="text-white">完成</ButtonText>
-                      </MyButton>
+                      </Button>
                     </View>
                   )}
 

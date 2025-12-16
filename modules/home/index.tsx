@@ -22,8 +22,8 @@ export default function Index() {
   const menus: Menu[] = [
     { title: '生产任务', imgUrl: require('@/assets/images/icons/1.png'), path: '/prod' },
     { title: '巡检任务', imgUrl: require('@/assets/images/icons/2.png'), path: '/inspec' },
-    { title: '生产日报', imgUrl: require('@/assets/images/icons/3.png'), path: '/daily-report' },
     { title: '缺陷', imgUrl: require('@/assets/images/icons/4.png'), path: '/bug' },
+    // { title: '生产日报', imgUrl: require('@/assets/images/icons/3.png'), path: '/daily-report' },
   ]
 
   return (

@@ -21,7 +21,7 @@ import { Card } from '@/components/ui/card'
 import { Text } from '@/components/ui/text'
 import { Textarea, TextareaInput } from '@/components/ui/textarea'
 import { useLoading, useNavigationBeforeRemoveGuard } from '@/hooks'
-import { selectDictLabel, useDict } from '@/utils'
+import { eventBus, selectDictLabel, useDict } from '@/utils'
 import { bugSchema, useBugCategoryList, useDevList, usePowerList } from './helper'
 
 export default function BugUpsert() {
@@ -63,14 +63,6 @@ export default function BugUpsert() {
 
   // 设备类型
   const devType = watch('devType')
-
-  // 设备类型变化 => 重新获取故障类别列表
-  useEffect(() => {
-    if (devType) {
-      fetchBugCategoryList(devType)
-    }
-  }, [devType])
-
   // 电站 id
   const psId = watch('psId')
 
@@ -79,18 +71,17 @@ export default function BugUpsert() {
     if (psId === value) {
       return
     }
-
+    // 重置状态
     setValue('devId', undefined)
     setValue('devType', '99')
     setValue('devName', undefined)
     setValue('bugAddr', undefined)
     setValue('bugCategory', '')
-
     // 设备类型
     const devType = getValues('devType')
-    // 重置故障类别列表
+    // 刷新故障类别列表
     fetchBugCategoryList(devType)
-    // 获取设备列表
+    // 刷新设备列表
     fetchDevList(value)
   }
 
@@ -122,17 +113,22 @@ export default function BugUpsert() {
     if (isEmpty(data.bugAddr) && isEmpty(data.devId)) {
       return toast.warning('设备和缺陷位置必须填写一项')
     }
-
     shouldPass.current = true
-
     showLoading('提交中...')
     const { msg } = await addBug(data).finally(hideLoading)
     toast.success(msg)
-    router.dismissTo({
-      pathname: '/bug',
-      params: { refreshSignal: 'true' },
-    })
+    // 通知列表刷新
+    eventBus.emit('bug:list:refresh')
+    // 返回列表
+    router.back()
   }
+
+  // 设备类型变化 => 重新获取故障类别列表
+  useEffect(() => {
+    if (devType) {
+      fetchBugCategoryList(devType)
+    }
+  }, [devType])
 
   return (
     <View className="flex-1 bg-background-50 pb-safe">

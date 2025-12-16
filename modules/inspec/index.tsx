@@ -9,7 +9,7 @@ import { listPatorlTask } from '@/api/ptms/task/patorlTask'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { TabsMenu } from '@/components/tabs'
-import { useDict } from '@/utils'
+import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/Item'
 
 // 数据类型
@@ -26,6 +26,8 @@ const tabs: TabMenu<string>[] = [
 ]
 
 export default function Inspec() {
+  // FlatList 引用
+  const flatListRef = useRef<FlatList<PatorlTaskVO>>(null)
   // 路由
   const router = useRouter()
   // 字典数据
@@ -57,6 +59,10 @@ export default function Inspec() {
       abortController.current = new AbortController()
     },
   })
+  // 回到顶部
+  const goToTop = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+  }
   // Tab 切换
   const onTabChange = (item: TabMenu, _: number) => {
     // 设置查询参数
@@ -74,6 +80,14 @@ export default function Inspec() {
   const handleItemPress = (item: PatorlTaskVO) => {
     router.push(`/inspec/${item.id}`)
   }
+
+  // 列表刷新
+  useEventBus('inspec:list:refresh', () => {
+    // 回到顶部
+    goToTop()
+    // 刷新
+    reload()
+  })
 
   return (
     <View className="flex-1 bg-background-50 pb-safe">
@@ -93,6 +107,7 @@ export default function Inspec() {
       <TabsMenu tabs={tabs} onTabChange={onTabChange} />
 
       <FlatList
+        ref={flatListRef}
         onEndReached={loadMore}
         onEndReachedThreshold={0.2}
         className="p-4"

@@ -20,6 +20,7 @@ import { ButtonText } from '@/components/ui/button'
 import { DATA_TYPE_MAP } from '@/enums'
 import { useLoading, useNavigationBeforeRemoveGuard } from '@/hooks'
 import { useUserStore } from '@/store/user'
+import { eventBus } from '@/utils'
 import { recordSchema, useIsAddOrEditRoute } from './helper'
 
 export default function RecordUpsert() {
@@ -119,20 +120,22 @@ export default function RecordUpsert() {
     const { msg } = await doProductTaskExecute({ ...data, status })
       .finally(hideLoading)
     toast.success(msg)
+    // 通知详情刷新
+    eventBus.emit('prod:detail:refresh')
+    // 返回详情
+    router.back()
   }
 
   // 保存
   async function onSave(data: RecordForm) {
     shouldPass.current = true
     await doExecuteRequest({ data, status: '0', loadingText: '保存中...' })
-    router.back()
   }
 
   // 提交
   async function onSubmit(data: RecordForm) {
     shouldPass.current = true
     await doExecuteRequest({ data, status: '1', loadingText: '提交中...' })
-    router.back()
   }
 
   return (

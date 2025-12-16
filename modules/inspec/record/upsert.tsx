@@ -23,6 +23,7 @@ import { Divider } from '@/components/ui/divider'
 import { DATA_TYPE_MAP } from '@/enums'
 import { useLoading, useNativeLocation, useNavigationBeforeRemoveGuard } from '@/hooks'
 import { useUserStore } from '@/store/user'
+import { eventBus } from '@/utils'
 import { getLocationAsync } from '@/utils/locationService'
 import { recordSchema, useIsAddOrEditRoute } from './helper'
 
@@ -150,20 +151,22 @@ export default function InspecRecordUpsert() {
     })
       .finally(hideLoading)
     toast.success(msg)
+    // 通知内容刷新
+    eventBus.emit('inspec:content:refresh')
+    // 返回内容
+    router.back()
   }
 
   // 保存
   async function onSave(data: RecordForm) {
     shouldPass.current = true
     await doExecuteRequest({ data, status: '0', loadingText: '保存中...' })
-    router.back()
   }
 
   // 提交
   async function onSubmit(data: RecordForm) {
     shouldPass.current = true
     await doExecuteRequest({ data, status: '1', loadingText: '提交中...' })
-    router.back()
   }
 
   return (

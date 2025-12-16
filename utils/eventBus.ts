@@ -10,11 +10,10 @@ export interface Events {
   'inspec:detail:refresh': void
   'inspec:content:refresh': void
   'bug:list:refresh': void
-  [key: string | symbol]: unknown
 }
 
 // 事件总线
-export const eventBus = mitt<Events>()
+export const eventBus = mitt<Events & Record<string | symbol, unknown>>()
 
 // 使用事件总线
 export function useEventBus<K extends keyof Events>(event: K, handler: Handler<Events[K]>) {

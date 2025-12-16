@@ -47,3 +47,4 @@ export function cn(...inputs: ClassValue[]) {
 
 export * from './base'
 export * from './dict'
+export * from './eventBus'

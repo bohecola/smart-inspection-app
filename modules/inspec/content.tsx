@@ -79,7 +79,7 @@ export default function InspecRecordContent() {
   })
 
   return (
-    <View className="p-4 flex-1 bg-background-50 pb-safe">
+    <View className="p-4 flex-1 bg-background-50 gap-3 pb-safe">
       {/* 图例 */}
       <Card className="gap-3">
         <View className="flex-row justify-around">
@@ -102,46 +102,44 @@ export default function InspecRecordContent() {
           variant="rounded"
           size="sm"
           prefixIcon={Search}
-          placeholder="请输入"
           value={keyword}
           onChangeText={setKeyword}
           onSubmitEditing={onSubmitEditing}
         />
       </Card>
 
-      {loading
-        ? <ActivityIndicator className="mt-3" />
-        : (
-            <ScrollView>
-              <Card className="mt-3 flex-row flex-wrap">
-                {!isEmpty(searchList)
-                  ? (
-                      <Grid className="gap-4" _extra={{ className: 'grid-cols-2' }}>
-                        {searchList.map(item => (
-                          <GridItem key={item.objectId} _extra={{ className: 'col-span-1' }}>
-                            <LinearGradientBox
-                              className="p-4 items-center justify-center"
-                              variant={
-                                item.status === '1'
-                                  ? 'blue'
-                                  : item.status === '2'
-                                    ? 'green'
-                                    : 'red'
-                              }
-                              onPress={() => handleItemPress(item)}
-                            >
-                              <Text className="text-center font-bold">
-                                {item.objectName}
-                              </Text>
-                            </LinearGradientBox>
-                          </GridItem>
-                        ))}
-                      </Grid>
-                    )
-                  : <Empty />}
-              </Card>
-            </ScrollView>
-          )}
+      {/* 内容列表 */}
+      <ScrollView>
+        <Card>
+          {loading
+            ? <ActivityIndicator />
+            : isEmpty(searchList)
+              ? <Empty size="md" />
+              : (
+                  <Grid className="gap-4" _extra={{ className: 'grid-cols-2' }}>
+                    {searchList.map(item => (
+                      <GridItem key={item.objectId} _extra={{ className: 'col-span-1' }}>
+                        <LinearGradientBox
+                          className="p-4 items-center justify-center"
+                          variant={
+                            item.status === '1'
+                              ? 'blue'
+                              : item.status === '2'
+                                ? 'green'
+                                : 'red'
+                          }
+                          onPress={() => handleItemPress(item)}
+                        >
+                          <Text className="text-center font-bold">
+                            {item.objectName}
+                          </Text>
+                        </LinearGradientBox>
+                      </GridItem>
+                    ))}
+                  </Grid>
+                )}
+        </Card>
+      </ScrollView>
     </View>
   )
 }

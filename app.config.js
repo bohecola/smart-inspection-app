@@ -62,5 +62,13 @@ export default ({ config }) => ({
         locationAlwaysAndWhenInUsePermission: locationPermission,
       },
     ],
+    [
+      'expo-build-properties',
+      {
+        android: {
+          usesCleartextTraffic: true,
+        },
+      },
+    ],
   ],
 })

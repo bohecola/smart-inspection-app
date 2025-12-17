@@ -23,7 +23,7 @@
       "distribution": "internal",
       "environment": "preview",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "development"
       },
       "channel": "preview"
     },

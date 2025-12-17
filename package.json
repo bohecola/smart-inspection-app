@@ -11,7 +11,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build:dev:android": "eas build --profile development --platform android --local"
+    "build:dev:android": "eas build --profile development --platform android --local",
+    "build:preview:android": "eas build --profile preview --platform android --local"
   },
   "dependencies": {
     "@expo/html-elements": "^0.12.5",
@@ -32,6 +33,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.19",
     "expo": "~54.0.29",
+    "expo-build-properties": "~1.0.10",
     "expo-camera": "~17.0.10",
     "expo-constants": "~18.0.10",
     "expo-dev-client": "~6.0.20",

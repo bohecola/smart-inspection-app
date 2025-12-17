@@ -81,7 +81,7 @@ export function ImagePicker(props: ImagePickerProps) {
     const { assets, canceled } = await launchCameraAsync({
       mediaTypes: mediaType,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.5,
       exif: true,
     })
 

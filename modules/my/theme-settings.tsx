@@ -57,7 +57,7 @@ export default function ThemeSettings() {
       </RadioGroup>
 
       <View className="p-4">
-        <Card className="flex-row flex-wrap gap-5">
+        <Card>
           <Grid _extra={{ className: 'grid-cols-12' }}>
             {themeList.map(item => (
               <GridItem
@@ -67,7 +67,7 @@ export default function ThemeSettings() {
                 <Pressable onPress={() => setTheme(item.key)}>
                   <View
                     className={cn(
-                      'h-16 items-center justify-center',
+                      'w-14 h-14 items-center justify-center',
                       theme === item.key ? 'bg-background-600/10 rounded-lg' : '',
                     )}
                   >

@@ -1,6 +1,6 @@
 import { Linking } from 'react-native'
 import { DialogManager } from '@/components/dialog'
-import { useGlobSettings } from './settings'
+import { useGlobSettings } from '@/utils/settings'
 
 // 弹窗提示前往系统设置
 export async function alertToSettings(permission?: string) {

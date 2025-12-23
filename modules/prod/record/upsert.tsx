@@ -7,8 +7,9 @@ import { isNil } from 'lodash-es'
 import { CalendarIcon, UserIcon } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { doProductTaskExecute, getProductTaskRecordById, getProductTaskRecordTemp } from '@/api/ptms/task/productTask'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { MyButton } from '@/components/button'
 import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
@@ -141,7 +142,7 @@ export default function RecordUpsert() {
   return (
     <View className="flex-1 bg-background-50 gap-2 pb-safe">
       {loading
-        ? <ActivityIndicator className="mt-4" />
+        ? <MyActivityIndicator className="mt-4" />
         : (
             <>
               <ScrollView>

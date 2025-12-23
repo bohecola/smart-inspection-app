@@ -1,7 +1,7 @@
 import type { ColorValue } from 'react-native'
+import { useColorScheme } from 'nativewind'
 import { LinearGradient } from '@/components/ui/linear-gradient'
 import { Pressable } from '@/components/ui/pressable'
-import { useAppStore } from '@/store/app'
 import { cn } from '@/utils'
 
 export interface LinearGradientBoxProps {
@@ -26,9 +26,9 @@ const GRADUAL_COLORS_DARK: Record<LinearGradientBoxVariant, [ColorValue, ColorVa
 }
 
 export function LinearGradientBox({ children, className, variant, onPress }: LinearGradientBoxProps) {
-  const { colorMode } = useAppStore()
+  const { colorScheme } = useColorScheme()
 
-  const GRADUAL_COLORS = colorMode === 'light' ? GRADUAL_COLORS_LIGHT : GRADUAL_COLORS_DARK
+  const GRADUAL_COLORS = colorScheme === 'light' ? GRADUAL_COLORS_LIGHT : GRADUAL_COLORS_DARK
 
   return (
     <Pressable onPress={onPress}>

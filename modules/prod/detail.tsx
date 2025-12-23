@@ -5,8 +5,9 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { isNil } from 'lodash-es'
 import { ListCheck, PlusIcon } from 'lucide-react-native'
 import { useState } from 'react'
-import { ActivityIndicator, FlatList, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { dealDoneTask, getProductTaskInfo } from '@/api/ptms/task/productTask'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { useDialog } from '@/components/dialog'
 import { Empty } from '@/components/empty'
 import { Separator } from '@/components/list'
@@ -128,7 +129,7 @@ export default function ProdDetail() {
 
       <View className="p-4 flex-1 bg-background-50 pb-safe">
         {loading
-          ? <ActivityIndicator />
+          ? <MyActivityIndicator />
           : (
               <View className="flex-1 gap-2">
                 <Card className="shadow-hard-1 gap-4">

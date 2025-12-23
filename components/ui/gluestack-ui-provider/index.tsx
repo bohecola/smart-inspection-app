@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
-import { config } from './config';
+import React, { useEffect, useMemo } from 'react';
+import { GenerateConfig } from './config';
 import { View, ViewProps } from 'react-native';
 import { OverlayProvider } from '@gluestack-ui/core/overlay/creator';
 import { ToastProvider } from '@gluestack-ui/core/toast/creator';
 import { useColorScheme } from 'nativewind';
+import { useAppStore } from '@/store/app';
 
 export type ModeType = 'light' | 'dark' | 'system';
 
@@ -16,6 +17,12 @@ export function GluestackUIProvider({
   style?: ViewProps['style'];
 }) {
   const { colorScheme, setColorScheme } = useColorScheme();
+
+  const { theme } = useAppStore();
+
+  const config = useMemo(() => {
+    return GenerateConfig(theme);
+  }, [theme]);
 
   useEffect(() => {
     setColorScheme(mode);

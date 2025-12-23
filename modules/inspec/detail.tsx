@@ -4,8 +4,9 @@ import { useRequest } from 'ahooks'
 import dayjs from 'dayjs'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { ActivityIndicator, FlatList, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { getPatorlTaskInfo } from '@/api/ptms/task/patorlTask'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { Empty } from '@/components/empty'
 import { TabsMenu } from '@/components/tabs'
 import { Card } from '@/components/ui/card'
@@ -71,7 +72,7 @@ export default function InspecDetail() {
   return (
     <View className="p-4 flex-1 bg-background-50 pb-safe">
       {loading
-        ? <ActivityIndicator />
+        ? <MyActivityIndicator />
         : (
             <View className="flex-1 gap-2">
               <Card className="shadow-hard-1 gap-4">

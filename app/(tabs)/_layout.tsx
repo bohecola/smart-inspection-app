@@ -1,28 +1,33 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Tabs } from 'expo-router'
-import { useAppStore } from '@/store/app'
+import { useThemeSettings } from '@/hooks'
 
 export default function TabsLayout() {
-  const { color, backgroundColor } = useAppStore()
+  const { primaryColor, tintColor, backgroundColor } = useThemeSettings()
 
   return (
     <Tabs screenOptions={{
       headerTitleAlign: 'center',
-      headerTintColor: color,
+      headerTintColor: tintColor,
       headerStyle: {
         backgroundColor,
       },
       tabBarStyle: {
         backgroundColor,
       },
+      tabBarActiveTintColor: primaryColor,
     }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: '首页',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons color={color} name={focused ? 'home' : 'home-outline'} size={24} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              color={color}
+              name={focused ? 'home' : 'home-outline'}
+              size={24}
+            />
           ),
         }}
       />
@@ -30,8 +35,12 @@ export default function TabsLayout() {
         name="my"
         options={{
           title: '我的',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons color={color} name={focused ? 'person' : 'person-outline'} size={24} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              color={color}
+              name={focused ? 'person' : 'person-outline'}
+              size={24}
+            />
           ),
         }}
       />

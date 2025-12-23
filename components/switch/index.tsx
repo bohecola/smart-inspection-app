@@ -1,8 +1,10 @@
 import type { ISwitchProps } from '@/components/ui/switch'
+import { colord } from 'colord'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Switch } from '@/components/ui/switch'
 import { Text } from '@/components/ui/text'
+import { useThemeSettings } from '@/hooks'
 
 interface MySwitchProps extends ISwitchProps {
   value: any
@@ -16,6 +18,8 @@ export function MySwitch(props: MySwitchProps) {
   const { value = false, activeValue = true, inactiveValue = false, showValueText = false, onChange } = props
 
   const [active, setActive] = useState(value === activeValue)
+
+  const { primaryColor } = useThemeSettings()
 
   const handleChange = (isActive: boolean) => {
     setActive(isActive)
@@ -32,6 +36,11 @@ export function MySwitch(props: MySwitchProps) {
         {...props}
         value={active}
         onValueChange={handleChange}
+        thumbColor={active ? primaryColor : undefined}
+        trackColor={{
+          true: colord(primaryColor).alpha(0.3).toHex(),
+          false: undefined,
+        }}
       />
 
       {showValueText && (

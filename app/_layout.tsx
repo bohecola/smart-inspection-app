@@ -6,9 +6,8 @@ import React, { useEffect } from 'react'
 import { DialogProvider } from '@/components/dialog'
 import { GlobalLoading } from '@/components/loading'
 import { useAppToast } from '@/components/toast'
-import { Fab } from '@/components/ui/fab'
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
-import { Icon, MoonIcon, SunIcon } from '@/components/ui/icon'
+import { useThemeSettings } from '@/hooks'
 import { useAppStore } from '@/store/app'
 import { useUserStore } from '@/store/user'
 import { requestLocationPermission } from '@/utils/locationService'
@@ -23,9 +22,8 @@ export default function RootLayout() {
   useAppToast()
 
   const { token } = useUserStore()
-
-  const { colorMode, color, backgroundColor, setColorMode } = useAppStore()
-
+  const { colorMode } = useAppStore()
+  const { tintColor, backgroundColor } = useThemeSettings()
   const [, requestCameraPermission] = useCameraPermissions()
   const [, requestMediaLibraryPermission] = useMediaLibraryPermissions()
   // 请求权限
@@ -50,7 +48,7 @@ export default function RootLayout() {
           <StatusBar style="auto" />
           <Stack screenOptions={{
             headerTitleAlign: 'center',
-            headerTintColor: color,
+            headerTintColor: tintColor,
             headerStyle: {
               backgroundColor,
             },
@@ -73,18 +71,12 @@ export default function RootLayout() {
               <Stack.Screen name="bug/index" options={{ title: '缺陷列表' }} />
               <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
               <Stack.Screen name="bug/[id]/handle" options={{ title: '缺陷处理' }} />
+              <Stack.Screen name="my/theme-settings" options={{ title: '主题色彩' }} />
             </Stack.Protected>
             <Stack.Protected guard={isNil(token)}>
               <Stack.Screen name="sign-in" options={{ title: '登录' }} />
             </Stack.Protected>
           </Stack>
-          <Fab className="bottom-28 right-6 z-0" onPress={() => setColorMode(colorMode === 'light' ? 'dark' : 'light')}>
-            <Icon
-              as={colorMode === 'light' ? MoonIcon : SunIcon}
-              className="text-typography-0"
-            >
-            </Icon>
-          </Fab>
         </React.Fragment>
       </DialogProvider>
       <GlobalLoading />

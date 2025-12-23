@@ -4,10 +4,11 @@ import { useInfiniteScroll } from 'ahooks'
 import { useRouter } from 'expo-router'
 import { Search } from 'lucide-react-native'
 import { useRef, useState } from 'react'
-import { FlatList, RefreshControl, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { listPatorlTask } from '@/api/ptms/task/patorlTask'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
+import { MyRefreshControl } from '@/components/refresh-control'
 import { TabsMenu } from '@/components/tabs'
 import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/Item'
@@ -122,7 +123,7 @@ export default function Inspec() {
           />
         )}
         refreshControl={(
-          <RefreshControl
+          <MyRefreshControl
             refreshing={loading}
             onRefresh={reload}
           />

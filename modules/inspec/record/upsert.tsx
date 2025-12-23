@@ -7,9 +7,10 @@ import { groupBy, isNil } from 'lodash-es'
 import { CalendarIcon, MapPinned, UserIcon } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { doPatorlTaskExecute, getPatorlTaskRecordByContentId } from '@/api/ptms/task/patorlTask'
 import { MyAccordionItem } from '@/components/accordion'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { MyButton } from '@/components/button'
 import { CameraDeco } from '@/components/camera-deco'
 import { Cell, CellGroup } from '@/components/cell'
@@ -172,7 +173,7 @@ export default function InspecRecordUpsert() {
   return (
     <View className="flex-1 bg-background-50 gap-2 pb-safe">
       {loading
-        ? <ActivityIndicator className="mt-4" />
+        ? <MyActivityIndicator className="mt-4" />
         : (
             <>
               <ScrollView>

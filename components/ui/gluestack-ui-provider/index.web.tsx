@@ -1,10 +1,11 @@
 'use client';
 import React, { useEffect, useLayoutEffect } from 'react';
-import { config } from './config';
+import { GenerateConfig } from './config';
 import { OverlayProvider } from '@gluestack-ui/core/overlay/creator';
 import { ToastProvider } from '@gluestack-ui/core/toast/creator';
 import { setFlushStyles } from '@gluestack-ui/utils/nativewind-utils';
 import { script } from './script';
+import { useAppStore } from '@/store/app';
 
 export type ModeType = 'light' | 'dark' | 'system';
 
@@ -27,6 +28,9 @@ export function GluestackUIProvider({
   children?: React.ReactNode;
 }) {
   let cssVariablesWithMode = ``;
+  const { theme } = useAppStore();
+  const config = GenerateConfig(theme);
+  
   Object.keys(config).forEach((configKey) => {
     cssVariablesWithMode +=
       configKey === 'dark' ? `\n .dark {\n ` : `\n:root {\n`;

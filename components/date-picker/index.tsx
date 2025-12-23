@@ -16,11 +16,11 @@ import { cn } from '@/utils'
 interface MyDatePickerProps {
   mode?: 'datetime' | 'date' | 'time'
   value?: string
-  onChange?: (date: string) => void
+  placeholder?: string
   minDate?: Date
   maxDate?: Date
-  placeholder?: string
   isDisabled?: boolean
+  onChange?: (date: string) => void
 }
 
 const DATE_FOMAT_MAP = {

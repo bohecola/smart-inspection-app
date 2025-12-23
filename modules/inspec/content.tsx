@@ -5,8 +5,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { isEmpty, toLower } from 'lodash-es'
 import { Search } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { getContentByContentName } from '@/api/ptms/task/patorlTask'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { Empty } from '@/components/empty'
 import { MyInput } from '@/components/input'
 import { Card } from '@/components/ui/card'
@@ -112,7 +113,7 @@ export default function InspecRecordContent() {
       <ScrollView>
         <Card>
           {loading
-            ? <ActivityIndicator />
+            ? <MyActivityIndicator />
             : isEmpty(searchList)
               ? <Empty size="md" />
               : (

@@ -8,9 +8,10 @@ import { isArray, isEmpty, isNil } from 'lodash-es'
 import { PlusIcon, Trash2 } from 'lucide-react-native'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { finishBug, firstBugSave, getBugInfo, secondBugSave } from '@/api/ptms/bug/bugInfo'
 import { MyAccordionItem } from '@/components/accordion'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { MyButton } from '@/components/button'
 import { Cell, CellGroup } from '@/components/cell'
 import { MyDatePicker } from '@/components/date-picker'
@@ -314,7 +315,7 @@ export default function BugHandle() {
       <View className="flex-1 bg-background-50 gap-2 pb-safe">
         {
           loading
-            ? (<ActivityIndicator className="mt-4" />)
+            ? (<MyActivityIndicator className="mt-4" />)
             : (
                 <>
                   <ScrollView>
@@ -563,7 +564,7 @@ export default function BugHandle() {
                                 <Text className="font-bold">消缺物料表</Text>
                                 <Pressable onPress={handleAddMaterial}>
                                   <View className="flex-row items-center gap-1">
-                                    <View className="w-6 h-6 bg-background-950 rounded-full items-center justify-center">
+                                    <View className="w-6 h-6 bg-primary-600 rounded-full items-center justify-center">
                                       <Icon className="text-background-0" size="sm" as={PlusIcon} />
                                     </View>
                                     <Text className="text-sm">新增</Text>
@@ -582,7 +583,7 @@ export default function BugHandle() {
                                 {!isDisabled
                                   ? (
                                       <Pressable onPress={handleRemoveMaterial(index)}>
-                                        <Icon size="md" as={Trash2} />
+                                        <Icon size="md" className="text-primary-600" as={Trash2} />
                                       </Pressable>
                                     )
                                   : null}

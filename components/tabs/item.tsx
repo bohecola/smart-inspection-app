@@ -22,7 +22,7 @@ export function TabMenuItem({ data, isActive, onPress }: TabMenuItemProps) {
       <View className="h-full flex-row items-center justify-center gap-1 relative">
         <Text className={cn(
           isActive
-            ? 'font-bold text-typography-900'
+            ? 'font-bold text-typography-700'
             : 'text-typography-500',
         )}
         >
@@ -41,7 +41,7 @@ export function TabMenuItem({ data, isActive, onPress }: TabMenuItemProps) {
 
         {isActive && (
           <View className={cn(
-            'absolute bottom-0 h-1 rounded-full bg-primary-950',
+            'absolute bottom-0 h-1 rounded-full bg-primary-600',
             isNil(data.badge)
               ? 'w-2/5'
               : 'w-1/2',

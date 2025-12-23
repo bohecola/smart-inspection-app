@@ -8,10 +8,11 @@ export type CellGroupProps = {
   title?: string | React.ReactNode
   inset?: boolean
   className?: string
+  showDivider?: boolean
 } & PropsWithChildren
 
 export function CellGroup(props: CellGroupProps) {
-  const { title, inset = false, children, ...rest } = props
+  const { title, inset = false, children, showDivider = true, ...rest } = props
   const validChildren = Array.isArray(children) ? children : [children]
 
   return (
@@ -26,7 +27,7 @@ export function CellGroup(props: CellGroupProps) {
             <View key={index}>
               {child}
 
-              {index < validChildren.length - 1 && <Divider />}
+              {showDivider && index < validChildren.length - 1 && <Divider className="opacity-30" />}
             </View>
           ))}
         </View>

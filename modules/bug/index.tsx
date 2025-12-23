@@ -3,10 +3,11 @@ import { useInfiniteScroll } from 'ahooks'
 import { Stack, useRouter } from 'expo-router'
 import { PlusIcon, Search } from 'lucide-react-native'
 import { useState } from 'react'
-import { FlatList, RefreshControl, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { listBug } from '@/api/ptms/bug/bugInfo'
 import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
+import { MyRefreshControl } from '@/components/refresh-control'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { useDict, useEventBus } from '@/utils'
@@ -97,7 +98,7 @@ export default function Bug() {
             />
           )}
           refreshControl={(
-            <RefreshControl
+            <MyRefreshControl
               refreshing={loading}
               onRefresh={reload}
             />

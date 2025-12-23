@@ -19,8 +19,9 @@ import { EyeIcon, EyeOffIcon } from '@/components/ui/icon'
 import { Image } from '@/components/ui/image'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
-import { useCaptcha, useGlobSettings, useShowPassword } from '@/hooks'
+import { useCaptcha, useShowPassword } from '@/hooks'
 import { useUserStore } from '@/store/user'
+import { useGlobSettings } from '@/utils/settings'
 
 // eslint-disable-next-line perfectionist/sort-imports
 const logoImage = require('@/assets/images/Logo.png')

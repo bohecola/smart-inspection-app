@@ -34,8 +34,8 @@ export default function Index() {
         alt="Banner"
       />
 
-      <Card className="p-0 mt-4 flex-row flex-wrap overflow-hidden">
-        <Grid className="justify-between" _extra={{ className: 'grid-cols-12' }}>
+      <Card className="p-0 mt-4">
+        <Grid _extra={{ className: 'grid-cols-12' }}>
           {menus.map(menu => (
             <GridItem
               key={menu.title}

@@ -1,4 +1,5 @@
-import { ActivityIndicator, View } from 'react-native'
+import { View } from 'react-native'
+import { MyActivityIndicator } from '@/components/activity-indicator'
 import { Text } from '@/components/ui/text'
 
 interface ListFooterComponentProps {
@@ -18,7 +19,7 @@ export function ListFooterComponent({ loading, error, hasMore, load }: ListFoote
       {
         // 加载中
         loading
-          ? (<ActivityIndicator />)
+          ? (<MyActivityIndicator />)
           // 加载失败
           : error
             ? (

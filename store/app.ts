@@ -1,3 +1,4 @@
+import type { Theme } from '@/components/ui/gluestack-ui-provider/config'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { mmkvStorage } from '@/utils/mmkv'
@@ -6,22 +7,27 @@ export type ColorMode = 'light' | 'dark' | 'system'
 
 export interface AppState {
   colorMode: ColorMode
-  color: string
-  backgroundColor: string
+  theme: Theme
   setColorMode: (colorMode: ColorMode) => void
+  setTheme: (theme: Theme) => void
 }
 
 export const useAppStore = create(persist<AppState>(set => ({
   colorMode: 'light',
-  color: '#000',
-  backgroundColor: '#fff',
+  theme: 'default',
   setColorMode: (colorMode: ColorMode) => {
     set((state) => {
       return {
         ...state,
         colorMode,
-        color: colorMode === 'light' ? '#000' : '#fff',
-        backgroundColor: colorMode === 'light' ? '#fff' : '#000',
+      }
+    })
+  },
+  setTheme: (theme: Theme) => {
+    set((state) => {
+      return {
+        ...state,
+        theme,
       }
     })
   },

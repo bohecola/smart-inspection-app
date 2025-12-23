@@ -34,11 +34,10 @@ export function Cell(props: CellProps) {
       onPress={clickable ? onPress : undefined}
       disabled={disabled}
     >
-      {(({ pressed }) => (
+      {(({ pressed: _ }) => (
         <View
           className={cn(
             'w-full py-3 flex-row justify-between items-top gap-2 bg-background-0',
-            pressed && clickable ? 'bg-background-100' : '',
             isGroup ? 'px-0' : 'px-4 rounded-lg',
             className,
           )}
@@ -57,7 +56,7 @@ export function Cell(props: CellProps) {
 
           {rightIcon && <Icon size="md" as={rightIcon}></Icon>}
 
-          {isLink && <Icon size="md" as={ChevronRightIcon}></Icon>}
+          {isLink && <Icon size="md" as={ChevronRightIcon} className="mt-[2px]"></Icon>}
         </View>
       ))}
     </Pressable>

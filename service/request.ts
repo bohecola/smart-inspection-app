@@ -4,10 +4,10 @@ import axios from 'axios'
 import { DialogManager } from '@/components/dialog/DialogManager'
 import { useAppToast } from '@/components/toast'
 import { ContentTypeEnum, ResultCodeEnum } from '@/enums/httpEnum'
-import { useGlobSettings } from '@/hooks'
 import { useUserStore } from '@/store/user'
 import { tansParams } from '@/utils/ruoyi'
 import { useMixedEncrypt } from '@/utils/security'
+import { useGlobSettings } from '@/utils/settings'
 import { checkStatus, useRequstCanceller } from './helper'
 
 const { apiUrl, clientId } = useGlobSettings()

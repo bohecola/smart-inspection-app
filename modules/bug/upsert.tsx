@@ -1,7 +1,7 @@
 import type { BugForm } from './helper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'expo-router'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { ScrollView, View } from 'react-native'
@@ -91,14 +91,17 @@ export default function BugUpsert() {
     setValue('bugCategory', '')
     // 设备项
     const [dev] = items
-    // 设备详情
-    const { data } = await getDeviceInfo(dev.id)
-    // 设置设备类型
-    setValue('devType', data.type)
-    setValue('devName', data.name)
-    setValue('bugAddr', data.installPos)
-    // 获取设备对应的故障类别
-    await fetchBugCategoryList(data.type)
+
+    if (!isNil(dev)) {
+      // 设备详情
+      const { data } = await getDeviceInfo(dev.id)
+      // 设置设备类型
+      setValue('devType', data.type)
+      setValue('devName', data.name)
+      setValue('bugAddr', data.installPos)
+      // 获取设备对应的故障类别
+      await fetchBugCategoryList(data.type)
+    }
   }
 
   // 导航离开确认

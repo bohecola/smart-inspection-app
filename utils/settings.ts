@@ -7,5 +7,6 @@ export function useGlobSettings(): Readonly<GlobConfig> {
     apiUrlPrefix: process.env.EXPO_PUBLIC_API_URL_PREFIX,
     appName: process.env.EXPO_PUBLIC_APP_NAME ?? 'Expo App',
     clientId: process.env.EXPO_PUBLIC_CLIENT_ID,
+    previewUrl: process.env.EXPO_PUBLIC_PREVIEW_URL,
   }
 }

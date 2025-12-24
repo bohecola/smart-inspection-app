@@ -4,4 +4,5 @@ export interface GlobConfig {
   apiUrlPrefix: string
   appName: string
   clientId: string
+  previewUrl: string
 }

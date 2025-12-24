@@ -72,6 +72,16 @@ export default function RootLayout() {
               <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
               <Stack.Screen name="bug/[id]/handle" options={{ title: '缺陷处理' }} />
               <Stack.Screen name="my/theme-settings" options={{ title: '主题色彩' }} />
+              <Stack.Screen
+                name="web-screen/[uri]"
+                options={({ route }) => {
+                  const params = route.params as { title?: string }
+                  const title = decodeURIComponent(params?.title)
+                  return {
+                    title,
+                  }
+                }}
+              />
             </Stack.Protected>
             <Stack.Protected guard={isNil(token)}>
               <Stack.Screen name="sign-in" options={{ title: '登录' }} />

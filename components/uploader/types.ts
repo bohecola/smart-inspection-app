@@ -22,7 +22,12 @@ export interface UploaderFileListItem {
 }
 
 export interface UploaderRef {
+  selectFiles: (options?: SelectFilesOptions) => Promise<void>
   uploadFile: (assets: UploadAsset[], extra?: FileExtra) => Promise<void>
+}
+
+export interface SelectFilesOptions {
+  success?: (assets: DocumentPickerAsset[]) => void
 }
 
 export interface UploaderProps {

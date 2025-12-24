@@ -4,7 +4,7 @@ import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import dayjs from 'dayjs'
 import { launchCameraAsync } from 'expo-image-picker'
 import { isNil } from 'lodash-es'
-import { CameraIcon, ImageIcon, VideoIcon } from 'lucide-react-native'
+import { CameraIcon, FileUp, ImageIcon, VideoIcon } from 'lucide-react-native'
 import { useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useAppToast } from '@/components/toast'
@@ -25,6 +25,7 @@ export interface ImagePickerProps {
   autoUpload?: boolean
   isDisabled?: boolean
   autoLocation?: boolean
+  allowFileSelect?: boolean
   onTakeMediaSuccess?: (value: ImagePickerAsset[]) => void
   onChange?: (value: string | string[]) => void
 }
@@ -41,6 +42,7 @@ export function ImagePicker(props: ImagePickerProps) {
     valueType = 'string',
     isDisabled = isFormControlDisabled,
     autoLocation = false,
+    allowFileSelect = false,
     onTakeMediaSuccess,
     onChange,
   } = props
@@ -146,6 +148,13 @@ export function ImagePicker(props: ImagePickerProps) {
   // 拍摄视频
   const handleTakeVideo = () => handleTakeMedia('videos')
 
+  // 选择文件
+  const handleSelectFile = async () => {
+    uploaderRef.current?.selectFiles({
+      success: handleClose,
+    })
+  }
+
   // 文件上传 Change 事件
   function onUploaderChange(value: string | string[]) {
     onChange?.(value)
@@ -206,6 +215,14 @@ export function ImagePicker(props: ImagePickerProps) {
             <ActionsheetIcon className="stroke-background-700" as={VideoIcon} />
             <ActionsheetItemText>拍摄视频</ActionsheetItemText>
           </ActionsheetItem>
+          {allowFileSelect
+            ? (
+                <ActionsheetItem onPress={handleSelectFile}>
+                  <ActionsheetIcon className="stroke-background-700" as={FileUp} />
+                  <ActionsheetItemText>选择文件</ActionsheetItemText>
+                </ActionsheetItem>
+              )
+            : null}
         </ActionsheetContent>
       </Actionsheet>
     </>

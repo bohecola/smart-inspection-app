@@ -460,6 +460,7 @@ export default function BugHandle() {
                                           value={value}
                                           onChange={onChange}
                                           autoUpload
+                                          allowFileSelect
                                         />
                                       </FormItem>
                                     )}

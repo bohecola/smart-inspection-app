@@ -1,5 +1,5 @@
 import type { ViewerRef } from './components/viewer'
-import type { FileExtra, UploadAsset, UploaderFileListItem, UploaderProps, UploaderRef } from './types'
+import type { FileExtra, SelectFilesOptions, UploadAsset, UploaderFileListItem, UploaderProps, UploaderRef } from './types'
 import { useFormControlContext } from '@gluestack-ui/core/form-control/creator'
 import { getDocumentAsync } from 'expo-document-picker'
 import { getThumbnailAsync } from 'expo-video-thumbnails'
@@ -60,7 +60,9 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
   const viewerRef = useRef<ViewerRef>(null)
 
   // 选择文件
-  async function handleSelectFiles() {
+  async function handleSelectFiles(options: SelectFilesOptions = {}) {
+    const { success } = options
+
     // 打开文件管理器选择文件
     const { assets, canceled } = await getDocumentAsync({
       type: mimeType,
@@ -86,6 +88,7 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
 
     // 选择文件回调
     onSelectFiles?.(assets)
+    success?.(assets)
 
     // 上传文件
     if (auto) {
@@ -270,6 +273,7 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
 
   // 暴露方法
   useImperativeHandle(ref, () => ({
+    selectFiles: (options?: SelectFilesOptions) => handleSelectFiles(options),
     uploadFile: (assets: UploadAsset[], extra?: FileExtra) => handleUploadFile(assets, extra),
   }))
 

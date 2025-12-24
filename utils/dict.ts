@@ -31,7 +31,7 @@ export function useDict(...args: string[]) {
             }
 
             // 缓存不存在 => 请求
-            const { data } = await getDicts(key)
+            const { data = [] } = await getDicts(key)
             const dictData = data.map((e: any): DictDataOption => ({
               label: e.dictLabel,
               value: e.dictValue,

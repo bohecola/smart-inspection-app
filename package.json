@@ -12,7 +12,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "build:dev:android": "eas build --profile development --platform android --local",
-    "build:preview:android": "eas build --profile preview --platform android --local"
+    "build:preview:android": "eas build --profile preview --platform android --local",
+    "env:pull:dev": "eas env:pull --environment development"
   },
   "dependencies": {
     "@expo/html-elements": "^0.12.5",

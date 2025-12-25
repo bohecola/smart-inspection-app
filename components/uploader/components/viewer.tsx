@@ -2,9 +2,13 @@ import type { ImageSource } from 'react-native-image-viewing/dist/@types'
 import type { FilePreviewType, UploaderFileListItem } from '../types'
 import CryptoJS from 'crypto-js'
 import { useRouter } from 'expo-router'
+import { ChevronLeft } from 'lucide-react-native'
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { View } from 'react-native'
+import { Modal, View } from 'react-native'
 import { ImagePreview } from '@/components/image-preview'
+import { Icon } from '@/components/ui/icon'
+import { Pressable } from '@/components/ui/pressable'
+import { VideoPlayer } from '@/components/video-player'
 import { encryptBase64 } from '@/utils/security'
 import { useGlobSettings } from '@/utils/settings'
 import { getFilePreviewType } from '../helper'
@@ -77,6 +81,31 @@ export const Viewer = forwardRef<ViewerRef, ViewerProps>((props, ref) => {
           visible={visible}
           onRequestClose={close}
         />
+      )
+    }
+
+    if (type === 'video') {
+      return (
+        <Modal
+          animationType="fade"
+          visible={visible}
+          onRequestClose={close}
+        >
+          <View className="relative bg-black flex-1 items-center justify-center">
+            <VideoPlayer
+              source={openOptions.item?.url}
+            />
+            <View className="p-safe absolute top-0 left-0 flex-row">
+              <Pressable onPress={close}>
+                <Icon
+                  as={ChevronLeft}
+                  size="xl"
+                  className="ml-4 text-3xl text-white"
+                />
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       )
     }
 

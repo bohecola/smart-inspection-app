@@ -70,5 +70,11 @@ export default ({ config }) => ({
         },
       },
     ],
+    [
+      'expo-screen-orientation',
+      {
+        initialOrientation: 'DEFAULT',
+      },
+    ],
   ],
 })

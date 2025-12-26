@@ -2,7 +2,8 @@ import type { ImageSource } from 'react-native-image-viewing/dist/@types'
 import type { FilePreviewType, UploaderFileListItem } from '../types'
 import CryptoJS from 'crypto-js'
 import { useRouter } from 'expo-router'
-import { ChevronLeft } from 'lucide-react-native'
+import * as ScreenOrientation from 'expo-screen-orientation'
+import { ArrowLeft } from 'lucide-react-native'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Modal, View } from 'react-native'
 import { ImagePreview } from '@/components/image-preview'
@@ -41,6 +42,8 @@ export const Viewer = forwardRef<ViewerRef, ViewerProps>((props, ref) => {
   const [openOptions, setOpenOptions] = useState<OpenOptions>({
     item: undefined,
   })
+  // 是否为横屏
+  const [isLandscape, setIsLandscape] = useState(false)
 
   // 打开
   const open = (options: OpenOptions) => {
@@ -69,7 +72,24 @@ export const Viewer = forwardRef<ViewerRef, ViewerProps>((props, ref) => {
   }
 
   // 关闭
-  const close = () => setVisible(false)
+  const close = async () => {
+    // 当前屏幕方向
+    const currentOrientation = await ScreenOrientation.getOrientationAsync()
+    // 当前屏幕方向为横屏 => 恢复屏幕方向
+    if (currentOrientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT) {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+    }
+
+    // 关闭预览
+    setVisible(false)
+  }
+
+  // 监听屏幕方向
+  ScreenOrientation.addOrientationChangeListener((event) => {
+    // 当前屏幕方向为横屏
+    const value = event.orientationInfo.orientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT
+    setIsLandscape(value)
+  })
 
   // 内容渲染
   const renderContent = () => {
@@ -91,19 +111,22 @@ export const Viewer = forwardRef<ViewerRef, ViewerProps>((props, ref) => {
           visible={visible}
           onRequestClose={close}
         >
-          <View className="relative bg-black flex-1 items-center justify-center">
-            <VideoPlayer
-              source={openOptions.item?.url}
-            />
-            <View className="p-safe absolute top-0 left-0 flex-row">
-              <Pressable onPress={close}>
-                <Icon
-                  as={ChevronLeft}
-                  size="xl"
-                  className="ml-4 text-3xl text-white"
-                />
-              </Pressable>
-            </View>
+          <View className="relative bg-black/95 flex-1 items-center justify-center">
+            <VideoPlayer source={openOptions.item?.url} />
+
+            {!isLandscape
+              ? (
+                  <View className="p-safe absolute top-0 left-0 flex-row">
+                    <Pressable onPress={close}>
+                      <Icon
+                        as={ArrowLeft}
+                        size="xl"
+                        className="ml-3 text-3xl text-white"
+                      />
+                    </Pressable>
+                  </View>
+                )
+              : null}
           </View>
         </Modal>
       )

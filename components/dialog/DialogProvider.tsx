@@ -13,7 +13,7 @@ export function DialogProvider({ children }: PropsWithChildren) {
   const [dialogState, setDialogState] = useState<DialogState>(null)
 
   const showDialog = useCallback((options: DialogOptions) => {
-    const { title = '系统提示', confirmText = '确定', cancelText = '取消', showCancelButton = false } = options
+    const { title = '系统提示', confirmText = '确定', cancelText = '取消', showCancelButton = false, closeOnOverlayClick = true } = options
 
     return new Promise<any>((resolve, reject) => {
       setDialogState({
@@ -22,6 +22,7 @@ export function DialogProvider({ children }: PropsWithChildren) {
         confirmText,
         cancelText,
         showCancelButton,
+        closeOnOverlayClick,
         resolve,
         reject,
       })
@@ -51,7 +52,7 @@ export function DialogProvider({ children }: PropsWithChildren) {
     <DialogContext.Provider value={{ showDialog, showConfirmDialog }}>
       {children}
 
-      <AlertDialog isOpen={!!dialogState} onClose={handleClose}>
+      <AlertDialog isOpen={!!dialogState} onClose={handleClose} closeOnOverlayClick={dialogState?.closeOnOverlayClick}>
         <AlertDialogBackdrop />
         <AlertDialogContent>
           <AlertDialogHeader>

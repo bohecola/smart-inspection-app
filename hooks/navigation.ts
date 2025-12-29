@@ -26,7 +26,7 @@ export function useNavigationBeforeRemoveGuard(options?: BeforeRemoveGuardOption
       (e as any)?.preventDefault()
 
       // 提示保存
-      await showConfirmDialog({ description: '是否保存后再返回？' })
+      await showConfirmDialog({ description: '是否保存后再返回？', closeOnOverlayClick: false })
         .then(async () => {
           // 确定回调
           await onConfirm?.()

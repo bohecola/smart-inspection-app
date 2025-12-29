@@ -11,6 +11,7 @@ export interface DialogBaseOptions {
   confirmText?: string
   cancelText?: string
   showCancelButton?: boolean
+  closeOnOverlayClick?: boolean
 }
 
 export interface DialogOptions extends DialogBaseOptions {

@@ -3,6 +3,7 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isNil } from 'lodash-es'
 import React, { useEffect } from 'react'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { DialogProvider } from '@/components/dialog'
 import { GlobalLoading } from '@/components/loading'
 import { useAppToast } from '@/components/toast'
@@ -42,54 +43,56 @@ export default function RootLayout() {
   }, [])
 
   return (
-    <GluestackUIProvider mode={colorMode}>
-      <DialogProvider>
-        <React.Fragment>
-          <StatusBar style="auto" />
-          <Stack screenOptions={{
-            headerTitleAlign: 'center',
-            headerTintColor: tintColor,
-            headerStyle: {
-              backgroundColor,
-            },
-          }}
-          >
-            <Stack.Protected guard={!isNil(token)}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
-              <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
-              <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
-              <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
-              <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
-              <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
-              <Stack.Screen name="inspec/[id]/index" options={{ title: '巡检任务详情' }} />
-              <Stack.Screen name="inspec/[id]/[contentName]/index" options={{ title: '巡检内容' }} />
-              <Stack.Screen name="inspec/[id]/[contentName]/add-record" options={{ title: '新增巡检任务执行记录' }} />
-              <Stack.Screen name="inspec/[id]/[contentName]/edit-record" options={{ title: '编辑巡检任务执行记录' }} />
-              <Stack.Screen name="inspec/[id]/[contentName]/view-record" options={{ title: '查看巡检任务执行记录' }} />
-              <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
-              <Stack.Screen name="bug/index" options={{ title: '缺陷列表' }} />
-              <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
-              <Stack.Screen name="bug/[id]/handle" options={{ title: '缺陷处理' }} />
-              <Stack.Screen name="my/theme-settings" options={{ title: '主题色彩' }} />
-              <Stack.Screen
-                name="web-screen/[uri]"
-                options={({ route }) => {
-                  const params = route.params as { title?: string }
-                  const title = decodeURIComponent(params?.title)
-                  return {
-                    title,
-                  }
-                }}
-              />
-            </Stack.Protected>
-            <Stack.Protected guard={isNil(token)}>
-              <Stack.Screen name="sign-in" options={{ title: '登录' }} />
-            </Stack.Protected>
-          </Stack>
-        </React.Fragment>
-      </DialogProvider>
-      <GlobalLoading />
-    </GluestackUIProvider>
+    <GestureHandlerRootView>
+      <GluestackUIProvider mode={colorMode}>
+        <DialogProvider>
+          <React.Fragment>
+            <StatusBar style="auto" />
+            <Stack screenOptions={{
+              headerTitleAlign: 'center',
+              headerTintColor: tintColor,
+              headerStyle: {
+                backgroundColor,
+              },
+            }}
+            >
+              <Stack.Protected guard={!isNil(token)}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="prod/index" options={{ title: '生产任务' }} />
+                <Stack.Screen name="prod/[id]/index" options={{ title: '生产任务详情' }} />
+                <Stack.Screen name="prod/[id]/add-record" options={{ title: '新增生产任务执行记录' }} />
+                <Stack.Screen name="prod/[id]/edit-record" options={{ title: '编辑生产任务执行记录' }} />
+                <Stack.Screen name="prod/[id]/view-record" options={{ title: '查看生产任务执行记录' }} />
+                <Stack.Screen name="inspec/index" options={{ title: '巡检任务' }} />
+                <Stack.Screen name="inspec/[id]/index" options={{ title: '巡检任务详情' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/index" options={{ title: '巡检内容' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/add-record" options={{ title: '新增巡检任务执行记录' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/edit-record" options={{ title: '编辑巡检任务执行记录' }} />
+                <Stack.Screen name="inspec/[id]/[contentName]/view-record" options={{ title: '查看巡检任务执行记录' }} />
+                <Stack.Screen name="daily-report/index" options={{ title: '生产日报' }} />
+                <Stack.Screen name="bug/index" options={{ title: '缺陷列表' }} />
+                <Stack.Screen name="bug/add" options={{ title: '新增缺陷' }} />
+                <Stack.Screen name="bug/[id]/handle" options={{ title: '缺陷处理' }} />
+                <Stack.Screen name="my/theme-settings" options={{ title: '主题色彩' }} />
+                <Stack.Screen
+                  name="web-screen/[uri]"
+                  options={({ route }) => {
+                    const params = route.params as { title?: string }
+                    const title = decodeURIComponent(params?.title)
+                    return {
+                      title,
+                    }
+                  }}
+                />
+              </Stack.Protected>
+              <Stack.Protected guard={isNil(token)}>
+                <Stack.Screen name="sign-in" options={{ title: '登录' }} />
+              </Stack.Protected>
+            </Stack>
+          </React.Fragment>
+        </DialogProvider>
+        <GlobalLoading />
+      </GluestackUIProvider>
+    </GestureHandlerRootView>
   )
 }

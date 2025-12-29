@@ -6,7 +6,9 @@ import { useVideoPlayer, VideoView } from 'expo-video'
 import { Maximize2, Minimize2, PauseIcon, PlayIcon } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
@@ -23,13 +25,13 @@ export function VideoPlayer({ source }: VideoPlayerProps) {
   const [inFullscreen, setInFullscreen] = useState(false)
   // 控制条
   const { showControls, resetControlsTimer, toggleControls } = useControls()
+
   // 视频播放器
   const player = useVideoPlayer(source, (player) => {
     player.loop = false
     player.timeUpdateEventInterval = 0.1
   })
-
-  // 监听播放状态
+  // 监听是否正在播放
   const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing })
   // 监听总时长
   const { duration } = useEvent(player, 'sourceLoad', {
@@ -40,26 +42,28 @@ export function VideoPlayer({ source }: VideoPlayerProps) {
     availableAudioTracks: player.availableAudioTracks,
   })
   // 监听时间更新
-  const { currentTime } = useEvent(player, 'timeUpdate', {
+  const { currentTime, bufferedPosition } = useEvent(player, 'timeUpdate', {
     currentTime: player.currentTime,
     currentLiveTimestamp: player.currentLiveTimestamp,
     currentOffsetFromLive: player.currentOffsetFromLive,
     bufferedPosition: player.bufferedPosition,
   })
-
   // 视频加载后，自动开始播放
   useEffect(() => {
     if (duration) {
       player.play()
     }
   }, [duration, player])
-  // 视频播放完毕后，自动重置播放进度
+  // 监听播放完毕
   useEffect(() => {
-    if (player && currentTime >= duration) {
-      player.currentTime = 0
+    const playToEndSubscription = player.addListener('playToEnd', () => {
       player.pause()
+      player.currentTime = 0
+    })
+    return () => {
+      playToEndSubscription.remove()
     }
-  }, [currentTime, duration, player])
+  }, [])
 
   // 处理播放/暂停
   const togglePlayPause = () => {
@@ -92,12 +96,24 @@ export function VideoPlayer({ source }: VideoPlayerProps) {
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
     resetControlsTimer()
   }
+  // 双击手势
+  const doubleTap = Gesture.Tap()
+    .numberOfTaps(2)
+    .onStart(() => {
+      scheduleOnRN(togglePlayPause)
+    })
+  // 单击手势
+  const singleTap = Gesture.Tap()
+    .numberOfTaps(1)
+    .onStart(() => {
+      scheduleOnRN(toggleControls)
+    })
+  // 组合手势
+  const composedGesture = Gesture.Exclusive(doubleTap, singleTap)
 
   return (
-    <View className="w-full">
-      {/* 视频按压 */}
-      <Pressable className="relative" onPress={toggleControls}>
-        {/* 视频视图 */}
+    <View className="relative w-full">
+      <GestureDetector gesture={composedGesture}>
         <VideoView
           style={{
             width,
@@ -108,26 +124,30 @@ export function VideoPlayer({ source }: VideoPlayerProps) {
           player={player}
           allowsPictureInPicture
         />
+      </GestureDetector>
 
-        {/* 控制条 */}
-        {showControls
-          ? (
-              <View className="pb-safe px-safe-offset-6 absolute bottom-0 left-0 right-0 h-[50px] bg-black/40 flex-row items-center">
-                {/* 播放/暂停按钮 */}
-                <Pressable className="w-8 h-8 items-center justify-center" onPress={togglePlayPause}>
-                  <Icon
-                    as={isPlaying ? PauseIcon : PlayIcon}
-                    size="md"
-                    className="text-white"
-                  />
-                </Pressable>
-                {/* 当前播放时间 */}
-                <Text className="mx-2 text-white text-sm">{formatTime(currentTime)}</Text>
-                {/* 进度条 */}
+      {showControls
+        ? (
+            <View className="pb-safe px-safe-offset-6 absolute bottom-0 left-0 right-0 h-[50px] bg-black/40 flex-row items-center">
+              <Pressable className="w-8 h-8 items-center justify-center" onPress={togglePlayPause}>
+                <Icon
+                  as={isPlaying ? PauseIcon : PlayIcon}
+                  size="md"
+                  className="text-white"
+                />
+              </Pressable>
+
+              <Text className="ml-2 text-white text-sm">
+                {formatTime(currentTime)}
+              </Text>
+
+              <View className="relative flex-1">
+                <View className="absolute left-0 top-1/2 translate-y-0.5 px-[17px] w-full">
+                  <View className="h-0.5 bg-gray-500" style={{ width: `${(bufferedPosition / duration) * 100}%` }} />
+                </View>
+
                 <Slider
                   style={{
-                    flex: 1,
-                    marginHorizontal: 10,
                     height: 40,
                   }}
                   minimumValue={0}
@@ -139,20 +159,20 @@ export function VideoPlayer({ source }: VideoPlayerProps) {
                   thumbTintColor="#FFFFFF"
                   tapToSeek={true}
                 />
-                {/* 总时长 */}
-                <Text className="mx-2 text-white text-sm">{formatTime(duration)}</Text>
-                {/* 全屏/退出全屏按钮 */}
-                <Pressable className="w-8 h-8 items-center justify-center" onPress={inFullscreen ? exitFullscreen : enterFullscreen}>
-                  <Icon
-                    as={inFullscreen ? Minimize2 : Maximize2}
-                    size="md"
-                    className="text-white"
-                  />
-                </Pressable>
               </View>
-            )
-          : null}
-      </Pressable>
+
+              <Text className="mr-2 text-white text-sm">{formatTime(duration)}</Text>
+
+              <Pressable className="w-8 h-8 items-center justify-center" onPress={inFullscreen ? exitFullscreen : enterFullscreen}>
+                <Icon
+                  as={inFullscreen ? Minimize2 : Maximize2}
+                  size="md"
+                  className="text-white"
+                />
+              </Pressable>
+            </View>
+          )
+        : null}
     </View>
   )
 }

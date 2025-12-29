@@ -6,6 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import { ArrowLeft } from 'lucide-react-native'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Modal, View } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ImagePreview } from '@/components/image-preview'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
@@ -111,23 +112,25 @@ export const Viewer = forwardRef<ViewerRef, ViewerProps>((props, ref) => {
           visible={visible}
           onRequestClose={close}
         >
-          <View className="relative bg-black/95 flex-1 items-center justify-center">
-            <VideoPlayer source={openOptions.item?.url} />
+          <GestureHandlerRootView>
+            <View className="relative bg-black/95 flex-1 items-center justify-center">
+              <VideoPlayer source={openOptions.item?.url} />
 
-            {!isLandscape
-              ? (
-                  <View className="p-safe absolute top-0 left-0 flex-row">
-                    <Pressable onPress={close}>
-                      <Icon
-                        as={ArrowLeft}
-                        size="xl"
-                        className="ml-3 text-3xl text-white"
-                      />
-                    </Pressable>
-                  </View>
-                )
-              : null}
-          </View>
+              {!isLandscape
+                ? (
+                    <View className="p-safe absolute top-0 left-0 flex-row">
+                      <Pressable onPress={close}>
+                        <Icon
+                          as={ArrowLeft}
+                          size="xl"
+                          className="ml-3 text-3xl text-white"
+                        />
+                      </Pressable>
+                    </View>
+                  )
+                : null}
+            </View>
+          </GestureHandlerRootView>
         </Modal>
       )
     }

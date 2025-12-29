@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "requiresFullScreen": true,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.bohecola.smartinspectionapp",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "我们需要您的位置来获取拍照地点的经纬度信息。"

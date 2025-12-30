@@ -1,7 +1,7 @@
 import type { ISelectProps } from '@/components/ui/select'
 import { useMemo } from 'react'
 import { ChevronDownIcon } from '@/components/ui/icon'
-import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from '@/components/ui/select'
+import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectScrollView, SelectTrigger } from '@/components/ui/select'
 
 export interface SelectOption {
   label: string
@@ -37,19 +37,21 @@ export function MySelect(props: SelectProps) {
 
       <SelectPortal>
         <SelectBackdrop />
-        <SelectContent>
+        <SelectContent className="max-h-[70%]">
           <SelectDragIndicatorWrapper>
             <SelectDragIndicator />
           </SelectDragIndicatorWrapper>
 
-          {options.map(({ label, value, isDisabled }) => (
-            <SelectItem
-              key={value}
-              label={label}
-              value={value}
-              isDisabled={isDisabled}
-            />
-          ))}
+          <SelectScrollView>
+            {options.map(({ label, value, isDisabled }) => (
+              <SelectItem
+                key={value}
+                label={label}
+                value={value}
+                isDisabled={isDisabled}
+              />
+            ))}
+          </SelectScrollView>
         </SelectContent>
       </SelectPortal>
     </Select>

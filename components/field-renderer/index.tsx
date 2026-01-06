@@ -59,7 +59,7 @@ export function FieldRenderer(props: Props) {
         <MySelect
           selectedValue={value}
           onValueChange={onChange}
-          options={transformOptions(data.remark)}
+          options={transformOptions(data.example)}
           placeholder="请选择"
         />
       )

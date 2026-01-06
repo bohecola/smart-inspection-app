@@ -204,7 +204,7 @@ export default function InspecRecordUpsert() {
                                     name={`recordResultList.${item.index}.result`}
                                     render={({ field: { value, onChange }, fieldState: { error } }) => (
                                       <FormItem
-                                        label={`${_ii + 1}.【${item.projectName}】${item.description}`}
+                                        label={`${_ii + 1}.${item.projectName ? `【${item.projectName}】` : ''} ${item.description}`}
                                         isInvalid={!!error}
                                         errorText={error?.message}
                                         isDisabled={isDisabled}

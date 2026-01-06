@@ -45,6 +45,28 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// 重试
+export async function retry<T>(fn: () => Promise<T>, maxRetries: number, delay: number = 1000, options: { showLoading: (message?: string) => void, hideLoading: () => void } = { showLoading: () => {}, hideLoading: () => {} }) {
+  const { showLoading, hideLoading } = options
+  let lastError: any
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn()
+    }
+    catch (error: any) {
+      lastError = error
+      // 提示
+      showLoading(`正在重新尝试，剩余 ${maxRetries - i} 次，请稍后...`)
+      // 延时后执行重试
+      await new Promise(resolve => setTimeout(resolve, delay))
+      hideLoading()
+    }
+  }
+
+  throw lastError
+}
+
 export * from './base'
 export * from './dict'
 export * from './eventBus'

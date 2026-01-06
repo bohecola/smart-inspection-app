@@ -8,7 +8,8 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState }
 import { View } from 'react-native'
 import { upload, uploadWithLocation } from '@/api/comm'
 import { delOss, listByIds } from '@/api/system/oss'
-import { getFilenameExt } from '@/utils'
+import { useLoading } from '@/hooks'
+import { getFilenameExt, retry } from '@/utils'
 import { useAppToast } from '../toast'
 import { HelperText } from './components/helper-text'
 import { UploaderPreview } from './components/preview'
@@ -19,6 +20,7 @@ import { allTypeEnum, getValue, isImageType, isVideoType } from './helper'
 
 export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
   const { isDisabled: isFormControlDisabled, isInvalid } = useFormControlContext()
+  const { showLoading, hideLoading } = useLoading()
 
   const {
     value,
@@ -140,9 +142,9 @@ export const Uploader = forwardRef<UploaderRef, UploaderProps>((props, ref) => {
 
       try {
         // 上传文件
-        const { data } = extra
-          ? await uploadWithLocation(formData)
-          : await upload(formData)
+        const { data } = await retry(extra
+          ? () => uploadWithLocation(formData)
+          : () => upload(formData), 3, 2000, { showLoading, hideLoading })
 
         // 缩略图地址
         let thumbnailUrl: string

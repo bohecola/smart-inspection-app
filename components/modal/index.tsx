@@ -10,6 +10,7 @@ interface MyModalProps extends IModalProps {
   showConfirm?: boolean
   cancelText?: string
   confirmText?: string
+  showFooter?: boolean
   onCancel?: () => void
   onConfirm?: () => void
 }
@@ -21,6 +22,7 @@ export function MyModal(props: MyModalProps) {
     showConfirm = true,
     cancelText = '取消',
     confirmText = '确定',
+    showFooter = true,
     onCancel,
     onConfirm,
     ...rest
@@ -41,28 +43,32 @@ export function MyModal(props: MyModalProps) {
           )}
           {children}
         </ModalBody>
-        <ModalFooter className="w-full">
-          {showCancel && (
-            <Button
-              variant="outline"
-              action="secondary"
-              size="sm"
-              onPress={onCancel}
-              className="flex-grow"
-            >
-              <ButtonText>{cancelText}</ButtonText>
-            </Button>
-          )}
-          {showConfirm && (
-            <Button
-              onPress={onConfirm}
-              size="sm"
-              className="flex-grow"
-            >
-              <ButtonText>{confirmText}</ButtonText>
-            </Button>
-          )}
-        </ModalFooter>
+        {showFooter
+          ? (
+              <ModalFooter className="w-full">
+                {showCancel && (
+                  <Button
+                    variant="outline"
+                    action="secondary"
+                    size="sm"
+                    onPress={onCancel}
+                    className="flex-grow"
+                  >
+                    <ButtonText>{cancelText}</ButtonText>
+                  </Button>
+                )}
+                {showConfirm && (
+                  <Button
+                    onPress={onConfirm}
+                    size="sm"
+                    className="flex-grow"
+                  >
+                    <ButtonText>{confirmText}</ButtonText>
+                  </Button>
+                )}
+              </ModalFooter>
+            )
+          : null}
       </ModalContent>
     </Modal>
   )

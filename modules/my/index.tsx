@@ -1,12 +1,9 @@
-import * as Application from 'expo-application'
-import { Directory, File, Paths } from 'expo-file-system'
-import { startActivityAsync } from 'expo-intent-launcher'
 import { useRouter } from 'expo-router'
 import { InfoIcon, LogOut, Palette } from 'lucide-react-native'
 import { useMemo } from 'react'
-import { Platform, View } from 'react-native'
-import { checkVersion } from '@/api/comm'
+import { View } from 'react-native'
 import { Cell, CellGroup } from '@/components/cell'
+import { useCheckRelease } from '@/components/check-release'
 import { useDialog } from '@/components/dialog'
 import { useAppToast } from '@/components/toast'
 import { Card } from '@/components/ui/card'
@@ -24,8 +21,9 @@ export default function SettingsScreen() {
   const toast = useAppToast()
   const { colorMode } = useAppStore()
   const { info, logout } = useUserStore()
-  const { showConfirmDialog, showDialog } = useDialog()
+  const { showConfirmDialog } = useDialog()
   const { showLoading, hideLoading } = useLoading()
+  const { currentVersion, checkRelease } = useCheckRelease()
 
   const colorModeText = useMemo(() => {
     switch (colorMode) {
@@ -59,59 +57,7 @@ export default function SettingsScreen() {
   }
 
   // 检查版本
-  const handleCheckVersion = async () => {
-    showLoading('正在检查更新')
-    const { data } = await checkVersion().finally(hideLoading)
-
-    // 已是最新版本
-    if (data.version === Application.nativeApplicationVersion) {
-      return toast.show('已是最新版本')
-    }
-
-    if (Platform.OS === 'android') {
-      // 需要更新
-      showDialog({
-        title: `发现新版本${data.version}`,
-        description: data.description,
-        confirmText: '立即更新',
-        cancelText: '以后再说',
-        showCancelButton: data.forcedUpdate === 'N',
-      })
-        .then(async () => {
-          const updatesDir = new Directory(Paths.cache, 'updates')
-          if (!updatesDir.exists) {
-            updatesDir.create()
-          }
-
-          const urlParts = data.ossUrl.split('/')
-          const fileName = urlParts[urlParts.length - 1]
-          const destinationFile = new File(updatesDir, fileName)
-
-          try {
-            if (destinationFile.exists) {
-              destinationFile.delete()
-            }
-
-            showLoading('下载中...')
-
-            const output = await File.downloadFileAsync(data.ossUrl, destinationFile, {
-              idempotent: true,
-            }).finally(hideLoading)
-
-            await startActivityAsync('android.intent.action.INSTALL_PACKAGE', {
-              data: output.contentUri,
-              flags: 1,
-            })
-
-            output.delete()
-          }
-          catch (error) {
-            console.error(error)
-          }
-        })
-        .catch(() => {})
-    }
-  }
+  const handleCheckVersion = () => checkRelease()
 
   return (
     <View className="gap-3 flex-1 bg-background-50">
@@ -137,7 +83,7 @@ export default function SettingsScreen() {
         <Cell
           icon={InfoIcon}
           title="检查更新"
-          value={Application.nativeApplicationVersion}
+          value={currentVersion}
           isLink
           onPress={handleCheckVersion}
         />

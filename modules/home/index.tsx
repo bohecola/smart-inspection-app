@@ -1,6 +1,8 @@
 import type { Href } from 'expo-router'
 import { useRouter } from 'expo-router'
+import { useEffect } from 'react'
 import { View } from 'react-native'
+import { useCheckRelease } from '@/components/check-release'
 import { Card } from '@/components/ui/card'
 import { Grid, GridItem } from '@/components/ui/grid'
 import { Image } from '@/components/ui/image'
@@ -18,6 +20,7 @@ interface Menu {
 
 export default function Index() {
   const router = useRouter()
+  const { checkRelease } = useCheckRelease()
 
   const menus: Menu[] = [
     { title: '生产任务', imgUrl: require('@/assets/images/icons/1.png'), path: '/prod' },
@@ -25,6 +28,10 @@ export default function Index() {
     { title: '缺陷', imgUrl: require('@/assets/images/icons/4.png'), path: '/bug' },
     // { title: '生产日报', imgUrl: require('@/assets/images/icons/3.png'), path: '/daily-report' },
   ]
+
+  useEffect(() => {
+    checkRelease({ quiet: true })
+  }, [])
 
   return (
     <View className="p-4 flex-1 bg-background-50">

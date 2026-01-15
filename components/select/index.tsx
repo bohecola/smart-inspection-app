@@ -13,11 +13,12 @@ export interface SelectOption {
 interface SelectProps extends ISelectProps {
   options?: SelectOption[]
   placeholder?: string
+  variant?: 'underlined' | 'outline' | 'rounded'
   onChange?: (value: string) => void
 }
 
 export function MySelect(props: SelectProps) {
-  const { options = [], placeholder = '请选择', onChange, ...rest } = props
+  const { options = [], placeholder = '请选择', variant = 'outline', onChange, ...rest } = props
 
   function onValueChange(value: string) {
     rest.onValueChange?.(value)
@@ -30,7 +31,7 @@ export function MySelect(props: SelectProps) {
 
   return (
     <Select {...rest} onValueChange={onValueChange}>
-      <SelectTrigger>
+      <SelectTrigger variant={variant}>
         <SelectInput value={label} placeholder={placeholder} />
         <SelectIcon className="ml-auto mr-3" as={ChevronDownIcon} />
       </SelectTrigger>

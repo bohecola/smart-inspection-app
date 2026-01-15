@@ -10,6 +10,7 @@ import { ListFooterComponent, Separator } from '@/components/list'
 import { MyRefreshControl } from '@/components/refresh-control'
 import { Icon } from '@/components/ui/icon'
 import { Pressable } from '@/components/ui/pressable'
+import { useUserStore } from '@/store/user'
 import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/item'
 
@@ -18,6 +19,8 @@ interface Data { list: BugInfoVO[], total: number }
 export default function Bug() {
   // 路由
   const router = useRouter()
+  // 电站id
+  const { psId } = useUserStore()
   // 字典数据
   const { bug_state } = useDict('bug_state')
   // 关键词
@@ -27,7 +30,12 @@ export default function Bug() {
   // 列表数据
   const { data, loading, loadingMore, noMore, error, loadMore, reload } = useInfiniteScroll<Data>(async (d) => {
     const page = d ? Math.ceil(d.list.length / PAGE_SIZE) + 1 : 1
-    const { rows, total } = await listBug({ keyword, pageNum: page, pageSize: PAGE_SIZE })
+    const { rows, total } = await listBug({
+      psId,
+      keyword,
+      pageNum: page,
+      pageSize: PAGE_SIZE,
+    })
     return {
       list: rows,
       total,

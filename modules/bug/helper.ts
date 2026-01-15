@@ -26,8 +26,20 @@ export const bugSchema = z.object({
 
 export type BugForm = z.infer<typeof bugSchema>
 
+interface Option {
+  label: string
+  value: string
+}
+
+interface UsePowerListOptions {
+  initFetch?: boolean
+  onFetchSuccess?: (options: Option[]) => void
+}
+
 // 电站列表
-export function usePowerList() {
+export function usePowerList(options: UsePowerListOptions = {}) {
+  const { initFetch = true, onFetchSuccess } = options
+
   const [powerList, setPowerList] = useState([])
   const [powerOptions, setPowerOptions] = useState([])
 
@@ -38,11 +50,14 @@ export function usePowerList() {
       .map(e => ({ label: e.psname, value: e.id }))
     setPowerList(data)
     setPowerOptions(options)
+    onFetchSuccess?.(options)
   }
 
-  useEffect(() => {
-    fetchPowerList()
-  }, [])
+  if (initFetch) {
+    useEffect(() => {
+      fetchPowerList()
+    }, [])
+  }
 
   return { powerList, powerOptions }
 }

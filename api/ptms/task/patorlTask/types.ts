@@ -472,7 +472,7 @@ export interface PatorlTaskQuery extends PageQuery {
   /**
    * 电站id
    */
-  psId?: number
+  psId?: string
   /**
    * 年度
    */

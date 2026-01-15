@@ -1,13 +1,17 @@
 import type { Href } from 'expo-router'
 import { useRouter } from 'expo-router'
+import { isNil } from 'lodash-es'
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import { useCheckRelease } from '@/components/check-release'
+import { MySelect } from '@/components/select'
 import { Card } from '@/components/ui/card'
 import { Grid, GridItem } from '@/components/ui/grid'
 import { Image } from '@/components/ui/image'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
+import { useUserStore } from '@/store/user'
+import { usePowerList } from '../bug/helper'
 
 // eslint-disable-next-line perfectionist/sort-imports
 const BannerImage = require('@/assets/images/banner.png')
@@ -20,14 +24,29 @@ interface Menu {
 
 export default function Index() {
   const router = useRouter()
+  const { psId, setPsId } = useUserStore()
+  const { powerOptions } = usePowerList({
+    onFetchSuccess: (options) => {
+      if (isNil(psId)) {
+        return setPsId(options[0].value)
+      }
+      const index = options.findIndex(e => e.value === psId)
+      if (index === -1) {
+        return setPsId(options[0].value)
+      }
+    },
+  })
   const { checkRelease } = useCheckRelease()
 
   const menus: Menu[] = [
     { title: '生产任务', imgUrl: require('@/assets/images/icons/1.png'), path: '/prod' },
     { title: '巡检任务', imgUrl: require('@/assets/images/icons/2.png'), path: '/inspec' },
     { title: '缺陷', imgUrl: require('@/assets/images/icons/4.png'), path: '/bug' },
-    // { title: '生产日报', imgUrl: require('@/assets/images/icons/3.png'), path: '/daily-report' },
   ]
+
+  const onPowerStationChange = (value: string) => {
+    setPsId(value)
+  }
 
   useEffect(() => {
     checkRelease({ quiet: true })
@@ -41,7 +60,16 @@ export default function Index() {
         alt="Banner"
       />
 
-      <Card className="p-0 mt-4">
+      <Card className="my-2">
+        <MySelect
+          selectedValue={psId}
+          options={powerOptions}
+          onChange={onPowerStationChange}
+          variant="rounded"
+        />
+      </Card>
+
+      <Card className="p-0">
         <Grid _extra={{ className: 'grid-cols-12' }}>
           {menus.map(menu => (
             <GridItem

@@ -11,6 +11,7 @@ import { ListFooterComponent, Separator } from '@/components/list'
 import { MyRefreshControl } from '@/components/refresh-control'
 import { TabsMenu } from '@/components/tabs'
 import { Divider } from '@/components/ui/divider'
+import { useUserStore } from '@/store/user'
 import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/Item'
 
@@ -29,6 +30,8 @@ const tabs: TabMenu<string>[] = [
 
 export default function Prod() {
   const router = useRouter()
+  // 电站id
+  const { psId } = useUserStore()
   // FlatList 引用
   const flatListRef = useRef<FlatList<ProductTaskVO>>(null)
   // 字典数据
@@ -39,6 +42,7 @@ export default function Prod() {
     taskType: '0',
     keyword: undefined,
     padStatus: tabs[0].data,
+    psId,
   })
   // 每页条数
   const PAGE_SIZE = 15

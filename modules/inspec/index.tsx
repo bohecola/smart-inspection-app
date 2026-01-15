@@ -10,6 +10,7 @@ import { MyInput } from '@/components/input'
 import { ListFooterComponent, Separator } from '@/components/list'
 import { MyRefreshControl } from '@/components/refresh-control'
 import { TabsMenu } from '@/components/tabs'
+import { useUserStore } from '@/store/user'
 import { useDict, useEventBus } from '@/utils'
 import { Item } from './components/Item'
 
@@ -31,12 +32,15 @@ export default function Inspec() {
   const flatListRef = useRef<FlatList<PatorlTaskVO>>(null)
   // 路由
   const router = useRouter()
+  // 电站id
+  const { psId } = useUserStore()
   // 字典数据
   const { product_task_state } = useDict('product_task_state')
   // 查询参数
   const [query, setQuery] = useState({
     keyword: undefined,
     padStatus: tabs[0].data,
+    psId,
   })
   // 每页条数
   const PAGE_SIZE = 15

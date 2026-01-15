@@ -10,12 +10,15 @@ export interface UserState {
   roles: string[]
   permissions: string[]
   info: UserVO
+  psId: string
   setToken: (token: string) => void
   get: () => Promise<void>
   logout: () => Promise<void>
+  setPsId: (psId: string) => void
 }
 
 export const useUserStore = create(persist<UserState>(set => ({
+  psId: undefined,
   token: undefined,
   info: null,
   roles: [],
@@ -45,6 +48,12 @@ export const useUserStore = create(persist<UserState>(set => ({
       roles: [],
       permissions: [],
     })
+  },
+  setPsId: (psId: string) => {
+    set(state => ({
+      ...state,
+      psId,
+    }))
   },
 }), {
   name: 'user-store',
